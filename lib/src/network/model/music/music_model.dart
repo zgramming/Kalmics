@@ -8,13 +8,13 @@ class MusicModel extends Equatable {
   final Tag? tag;
   final Uint8List? artwork;
   final String? pathFile;
-  final Duration? totalDuration;
+  final Duration? songDuration;
   const MusicModel({
     this.idMusic = '',
     this.tag,
     this.artwork,
     this.pathFile,
-    this.totalDuration,
+    this.songDuration,
   });
   @override
   List get props {
@@ -23,7 +23,7 @@ class MusicModel extends Equatable {
       tag,
       artwork,
       pathFile,
-      totalDuration,
+      songDuration,
     ];
   }
 
@@ -35,14 +35,14 @@ class MusicModel extends Equatable {
     Tag? tag,
     Uint8List? artwork,
     String? pathFile,
-    Duration? totalDuration,
+    Duration? songDuration,
   }) {
     return MusicModel(
       idMusic: idMusic ?? this.idMusic,
       tag: tag ?? this.tag,
       artwork: artwork ?? this.artwork,
       pathFile: pathFile ?? this.pathFile,
-      totalDuration: totalDuration ?? this.totalDuration,
+      songDuration: songDuration ?? this.songDuration,
     );
   }
 }
