@@ -26,7 +26,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
           final _currentSongIsPlaying = _currentSong.isPlaying;
           final _currentSongIsFloating = _currentSong.isFloating;
 
-          final artwork = _currentSong.song.artwork ?? Uint8List.fromList([]);
+          final artwork = _currentSong.song.artwork;
           final artist = _currentSong.song.tag?.artist ?? '';
           final album = _currentSong.song.tag?.album ?? '';
           return Visibility(
@@ -45,9 +45,21 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: CircleAvatar(
-                        radius: sizes.width(context),
-                        backgroundImage: MemoryImage(artwork),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.memory(
+                          artwork ?? Uint8List.fromList([]),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Expanded(

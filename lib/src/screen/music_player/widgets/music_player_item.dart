@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:typed_data';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,32 +12,23 @@ import '../../../network/my_network.dart';
 import '../../../provider/my_provider.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
 
-class MusicPlayerItem extends StatefulWidget {
+class MusicPlayerItem extends ConsumerWidget {
   final List<MusicModel> music;
 
-  const MusicPlayerItem({
-    Key? key,
-    required this.music,
-  }) : super(key: key);
-
+  MusicPlayerItem({required this.music});
+  final sharedParameter = SharedParameter();
   @override
-  _MusicPlayerItemState createState() => _MusicPlayerItemState();
-}
-
-class _MusicPlayerItemState extends State<MusicPlayerItem> {
-  final SharedParameter sharedParameter = SharedParameter();
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.music.length,
+      itemCount: music.length,
       itemBuilder: (context, index) {
-        final result = widget.music[index];
+        final result = music[index];
         final artis = result.tag?.artist;
         final artwork = result.artwork;
-        final durationInMinute = result.totalDuration?.inMinutes;
-        final remainingSecond = (result.totalDuration?.inSeconds ?? 0) % 60;
+        final durationInMinute = result.songDuration?.inMinutes;
+        final remainingSecond = (result.songDuration?.inSeconds ?? 0) % 60;
         final _remainingSecond = (remainingSecond > 9) ? '$remainingSecond' : '0$remainingSecond';
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,7 +37,6 @@ class _MusicPlayerItemState extends State<MusicPlayerItem> {
             ListTile(
               onTap: () {
                 context.read(currentSongProvider).playSong(result, index: index);
-
                 final players = context.read(globalAudioPlayers).state;
                 players.open(
                   Audio.file(
@@ -53,7 +46,7 @@ class _MusicPlayerItemState extends State<MusicPlayerItem> {
                   showNotification: true,
                   notificationSettings: sharedParameter.notificationSettings(
                     context,
-                    musics: widget.music,
+                    musics: music,
                   ),
                 );
                 Navigator.of(context).pushNamed(MusicPlayerDetailScreen.routeNamed);
@@ -62,17 +55,19 @@ class _MusicPlayerItemState extends State<MusicPlayerItem> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: colorPallete.accentColor,
                   border: Border.all(
                     color: Colors.white,
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(5),
-                  image: DecorationImage(
-                    image: AssetImage('${appConfig.urlImageAsset}/Kalmics.png'),
-                  ),
                 ),
-                child: (artwork == null) ? const Text('Unknown Artwork') : Image.memory(artwork),
+                child: Image.memory(
+                  artwork ?? Uint8List.fromList([]),
+                  errorBuilder: (context, error, stackTrace) {
+                    return ShowImageAsset(
+                        imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}');
+                  },
+                ),
               ),
               title: Text(
                 result.tag?.title ?? '',

@@ -1,10 +1,14 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:kalmics/src/config/my_config.dart';
 import 'package:kalmics/src/shared/my_shared.dart';
+import 'package:watcher/watcher.dart';
 
 import '../../provider/my_provider.dart';
 
@@ -19,6 +23,7 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final sharedParameter = SharedParameter();
+  final configFlutterLocalNotification = ConfigFlutterLocalNotification();
   int _selectedIndex = 0;
 
   final List<Widget> screens = [
@@ -28,45 +33,81 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   void initState() {
+    final watcher = DirectoryWatcher(ConstString.androidPathStorage);
+    watcher.events.listen((event) {
+      final file = File(event.path);
+      final basename = file.path.split('/').last;
+      if (basename.endsWith('.mp3')) {
+        ///* Detect if file has adding on storage
+        if (event.type == ChangeType.ADD) {
+          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+
+          configFlutterLocalNotification
+              .showPlanNotification(
+                title: 'File Has Added',
+                body: '$basename Detect has added to application',
+              )
+              .whenComplete(() => context.read(musicProvider).addMusic(file.path));
+        }
+
+        ///* Detect if file has remove on storage
+        if (event.type == ChangeType.REMOVE) {
+          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+
+          configFlutterLocalNotification
+              .showPlanNotification(
+                title: 'File Has Remove',
+                body: '$basename Detect has Remove to application',
+              )
+              .then((_) => context.read(musicProvider).removeMusic(file.path));
+        }
+
+        ///* Detect if file has modify on storage
+        // if (event.type == ChangeType.MODIFY) {
+        //   configFlutterLocalNotification.showPlanNotification(
+        //     title: 'File Has Modify',
+        //     body: '$basename Detect has Modify to application',
+        //   );
+        // }
+      }
+    });
+
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       final players = context.read(globalAudioPlayers).state;
-
       players.currentPosition.listen((currentDuration) {
         context.read(currentSongProvider).setDuration(currentDuration);
-        final currentIndex = context.read(currentSongProvider.state).currentIndex;
-        final totalDuration =
-            context.read(musicProvider.state)[currentIndex].totalDuration?.inSeconds ?? 0;
-        log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
+        final musics = context.read(musicProvider.state);
 
-        /// Listen to current duration & total duration song
-        /// If current duration exceeds the total song duration, Then Play Next Song
-        ///
-        if (currentDuration.inSeconds >= totalDuration) {
-          final musics = context.read(musicProvider.state);
+        if (musics.isNotEmpty) {
+          final currentIndex = context.read(currentSongProvider.state).currentIndex;
+          final totalDuration =
+              context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
+          // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
 
-          /// Need Check Loop Mode
-          /// If Mode is looping
-          final result = context.read(currentSongProvider).nextSong(musics);
-          players.open(
-            Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
-            showNotification: true,
-            notificationSettings: sharedParameter.notificationSettings(
-              context,
-              musics: musics,
-            ),
-          );
+          /// Listen to current duration & total duration song
+          /// If current duration exceeds the total song duration, Then Play Next Song
+          ///
+          if (currentDuration.inSeconds >= totalDuration) {
+            final musics = context.read(musicProvider.state);
+
+            /// Need Check Loop Mode
+            /// If Mode is looping
+            final result = context.read(currentSongProvider).nextSong(musics);
+            players.open(
+              Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
+              showNotification: true,
+              notificationSettings: sharedParameter.notificationSettings(
+                context,
+                musics: musics,
+              ),
+            );
+          }
         }
       });
 
-      players.loopMode.listen((event) {
-        log('1.) loopmode $event');
-      });
-      players.current.listen((event) {
-        log('2.) currentListen $event');
-      });
-      players.isPlaying.listen((event) {
-        log('3.) playingListen $event');
-      });
+      players.onErrorDo = (handler) {
+        log('1.) ${handler.error.message}\n2.)${handler.error.errorType}');
+      };
       players.playerState.listen((state) {
         log('4.) playerStateListen $state');
         final _currentSong = context.read(currentSongProvider.state);
@@ -82,18 +123,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             break;
         }
       });
-
-      players.playlistFinished.listen((finished) {
-        if (finished) {
-          log('5.) Finished song true $finished');
-        } else {
-          log('5.) Finished song false $finished');
-        }
-      });
-
-      players.playlistAudioFinished.listen((playing) {
-        log('6.) Finished song $playing');
-      });
     });
     super.initState();
   }
@@ -102,9 +131,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorPallete.primaryColor,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: screens,
+      body: Consumer(
+        builder: (context, watch, child) {
+          final futureListMusic = watch(futureShowListMusic);
+          return futureListMusic.when(
+            data: (_) {
+              return IndexedStack(index: _selectedIndex, children: screens);
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stackTrace) => Center(
+              child: Text(
+                error.toString(),
+                style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        },
       ),
       floatingActionButton: InkWell(
         onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),

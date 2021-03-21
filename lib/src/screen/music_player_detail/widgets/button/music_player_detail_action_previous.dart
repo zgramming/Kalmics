@@ -18,18 +18,24 @@ class MusicPlayerDetailActionPrevious extends ConsumerWidget {
       color: Colors.white,
       icon: const Icon(Icons.skip_previous_rounded),
       onPressed: () {
-        final result = context.read(currentSongProvider).previousSong(_musics);
-        players.open(
-          Audio.file(
-            result.pathFile ?? '',
-            metas: sharedParameter.metas(result),
-          ),
-          showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
-            context,
-            musics: _musics,
-          ),
-        );
+        final _globalAnimation = context.read(globalSizeAnimationController).state;
+        _globalAnimation?.reset();
+
+        Future.delayed(const Duration(milliseconds: 200), () {
+          final result = context.read(currentSongProvider).previousSong(_musics);
+          players.open(
+            Audio.file(
+              result.pathFile ?? '',
+              metas: sharedParameter.metas(result),
+            ),
+            showNotification: true,
+            notificationSettings: sharedParameter.notificationSettings(
+              context,
+              musics: _musics,
+            ),
+          );
+          _globalAnimation?.forward();
+        });
       },
     );
   }

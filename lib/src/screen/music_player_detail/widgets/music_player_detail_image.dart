@@ -17,13 +17,13 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
   @override
   void initState() {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      context.read(settingProvider).readSettingProvider();
+      context.read(globalSizeAnimationController).state = _sizeController;
     });
-
     _sizeController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _sizeAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _sizeController, curve: Curves.fastOutSlowIn));
     _sizeController.forward();
+
     super.initState();
   }
 
@@ -37,6 +37,7 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
+      padding: const EdgeInsets.only(top: 16.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Consumer(
@@ -50,6 +51,13 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
                 artwork ?? Uint8List.fromList([]),
                 fit: BoxFit.cover,
                 width: sizes.width(context),
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                    fit: BoxFit.cover,
+                    width: sizes.width(context),
+                  );
+                },
               ),
             );
           },

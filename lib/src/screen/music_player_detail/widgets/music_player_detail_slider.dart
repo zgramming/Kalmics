@@ -16,7 +16,7 @@ class MusicPlayerDetailSlider extends ConsumerWidget {
     var totalDurationInMinute = 0;
     String _totalRemainingSecond = '';
     if (isShowTotal) {
-      final totalDuration = _musics[_currentSong.currentIndex].totalDuration;
+      final totalDuration = _musics[_currentSong.currentIndex].songDuration;
       totalDurationInMinute = totalDuration?.inMinutes ?? 0;
       final totalRemainingSecond = (totalDuration?.inSeconds ?? 0) % 60;
       _totalRemainingSecond =
@@ -53,7 +53,7 @@ class MusicPlayerDetailSlider extends ConsumerWidget {
             flex: 10,
             child: Slider.adaptive(
               value: _currentSong.currentDuration.inSeconds.toDouble(),
-              max: _currentSong.song.totalDuration?.inSeconds.toDouble() ?? 0.0,
+              max: _currentSong.song.songDuration?.inSeconds.toDouble() ?? 0.0,
               onChangeStart: (value) {
                 final newDuration = Duration(seconds: value.toInt());
                 context.read(currentSongProvider).setDuration(newDuration);

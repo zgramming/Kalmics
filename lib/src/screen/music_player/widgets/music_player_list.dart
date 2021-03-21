@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -13,33 +15,10 @@ class MusicPlayerList extends StatelessWidget {
       height: sizes.screenHeightMinusAppBarAndStatusBar(context),
       child: Consumer(
         builder: (context, watch, child) {
-          final futureListMusic = watch(futureShowListMusic);
-          final musics = watch(musicProvider.state);
-          final _currentSongIsPlaying = watch(currentSongProvider.state).song.idMusic.isNotEmpty;
+          final _currentSongProvider = watch(currentSongProvider.state);
+          final _totalMusic = watch(totalMusic).state;
+          final _filteredMusic = watch(filteredMusic).state;
 
-          if (musics.isEmpty) {
-            return futureListMusic.when(
-              data: (value) {
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      MusicPlayerItem(music: musics),
-                      if (_currentSongIsPlaying) const SizedBox(height: 80)
-                    ],
-                  ),
-                );
-              },
-              loading: () {
-                return const Center(child: CircularProgressIndicator());
-              },
-              error: (error, stackTrace) {
-                return Center(
-                  child: Text(error.toString()),
-                );
-              },
-            );
-          }
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -47,7 +26,7 @@ class MusicPlayerList extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Total Lagu : ${musics.length} ',
+                    'Total Lagu : $_totalMusic ',
                     textAlign: TextAlign.right,
                     style: GoogleFonts.openSans(
                       fontWeight: FontWeight.bold,
@@ -55,8 +34,8 @@ class MusicPlayerList extends StatelessWidget {
                     ),
                   ),
                 ),
-                MusicPlayerItem(music: musics),
-                if (_currentSongIsPlaying) const SizedBox(height: 80)
+                MusicPlayerItem(music: _filteredMusic),
+                if (_currentSongProvider.song.idMusic.isNotEmpty) const SizedBox(height: 80)
               ],
             ),
           );

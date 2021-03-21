@@ -1,7 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kalmics/src/provider/my_provider.dart';
 
 const urlImageTesting = 'https://homepages.cae.wisc.edu/~ece533/images/girl.png';
 
@@ -92,6 +94,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     animationController.forward();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -209,11 +217,42 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       },
                     ),
                   ),
-                  SizedBox(height: sizes.statusBarHeight(context) * 2),
+                  Consumer(
+                    builder: (context, watch, child) {
+                      final _currengSongProvider = watch(currentSongProvider.state);
+                      final _currentSongIsPlaying = _currengSongProvider.song.idMusic.isNotEmpty;
+                      if (_currentSongIsPlaying) {
+                        return SizedBox(height: sizes.height(context) / 8);
+                      }
+                      return SizedBox(height: sizes.height(context) / 10);
+                    },
+                  ),
                 ],
               ),
             ),
           ),
+          Consumer(
+            builder: (context, watch, child) {
+              final _currengSongProvider = watch(currentSongProvider.state);
+              final _currentSongIsPlaying = _currengSongProvider.song.idMusic.isNotEmpty;
+
+              if (_currentSongIsPlaying) {
+                return Positioned(
+                  bottom: 10,
+                  right: 0,
+                  child: Container(
+                    height: sizes.height(context) / 10,
+                    width: sizes.width(context) / 3,
+                    decoration: BoxDecoration(
+                      color: colorPallete.accentColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox();
+            },
+          )
         ],
       ),
     );
