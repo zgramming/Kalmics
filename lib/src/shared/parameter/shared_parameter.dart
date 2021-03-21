@@ -12,6 +12,7 @@ class SharedParameter {
       artist: music.tag?.artist,
       id: music.idMusic,
       title: music.tag?.title,
+      // image: MetasImage.file(File.fromRawPath(music.artwork ?? Uint8List.fromList([])).path),
       onImageLoadFail: MetasImage.asset('${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}'),
     );
   }

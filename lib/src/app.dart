@@ -16,7 +16,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: colorPallete.primaryColor,
       ),
       home: SplashScreen(),
       onGenerateRoute: (settings) {
