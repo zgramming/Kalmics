@@ -32,21 +32,17 @@ packages:
   assets_audio_player:
     dependency: "direct main"
     description:
-      path: "."
-      ref: migrate-to-nnbd
-      resolved-ref: "191fb2608cf4d119bfe683a02204040702dfb086"
-      url: "https://github.com/nohli/Flutter-AssetsAudioPlayer"
-    source: git
-    version: "3.0.0-nullsafety.0"
+      name: assets_audio_player
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.3"
   assets_audio_player_web:
     dependency: transitive
     description:
-      path: assets_audio_player_web
-      ref: migrate-to-nnbd
-      resolved-ref: "191fb2608cf4d119bfe683a02204040702dfb086"
-      url: "https://github.com/nohli/Flutter-AssetsAudioPlayer.git"
-    source: git
-    version: "3.0.0-nullsafety.0"
+      name: assets_audio_player_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.3"
   async:
     dependency: transitive
     description:
@@ -276,6 +272,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.0"
+  flutter_local_notifications:
+    dependency: "direct main"
+    description:
+      name: flutter_local_notifications
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.0"
+  flutter_local_notifications_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   flutter_riverpod:
     dependency: "direct main"
     description:
@@ -690,6 +700,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.19"
+  timezone:
+    dependency: transitive
+    description:
+      name: timezone
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.0-nullsafety.0"
   timing:
     dependency: transitive
     description:
@@ -719,7 +736,7 @@ packages:
     source: hosted
     version: "2.1.0"
   watcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: watcher
       url: "https://pub.dartlang.org"
