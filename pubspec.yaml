@@ -23,12 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  global_template:
-    path: global_template
-  assets_audio_player:
-    git:
-      url: https://github.com/nohli/Flutter-AssetsAudioPlayer
-      ref: migrate-to-nnbd
+
   audiotagger: ^2.1.0
   cupertino_icons: ^1.0.2
   equatable: ^2.0.0
@@ -40,6 +35,13 @@ dependencies:
   path_provider: ^2.0.1
   permission_handler: ^6.1.0
   uuid: ^3.0.1
+  
+  assets_audio_player:
+    git:
+      url: https://github.com/nohli/Flutter-AssetsAudioPlayer
+      ref: migrate-to-nnbd
+  global_template:
+    path: global_template
 
 dev_dependencies:
   flutter_test:
