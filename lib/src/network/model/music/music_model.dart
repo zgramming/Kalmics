@@ -6,12 +6,14 @@ import 'package:equatable/equatable.dart';
 class MusicModel extends Equatable {
   final String idMusic;
   final Tag? tag;
+  final String? title;
   final Uint8List? artwork;
   final String? pathFile;
   final Duration? songDuration;
   const MusicModel({
     this.idMusic = '',
     this.tag,
+    this.title,
     this.artwork,
     this.pathFile,
     this.songDuration,
@@ -21,6 +23,7 @@ class MusicModel extends Equatable {
     return [
       idMusic,
       tag,
+      title,
       artwork,
       pathFile,
       songDuration,
@@ -33,6 +36,7 @@ class MusicModel extends Equatable {
   MusicModel copyWith({
     String? idMusic,
     Tag? tag,
+    String? title,
     Uint8List? artwork,
     String? pathFile,
     Duration? songDuration,
@@ -40,6 +44,7 @@ class MusicModel extends Equatable {
     return MusicModel(
       idMusic: idMusic ?? this.idMusic,
       tag: tag ?? this.tag,
+      title: title ?? this.title,
       artwork: artwork ?? this.artwork,
       pathFile: pathFile ?? this.pathFile,
       songDuration: songDuration ?? this.songDuration,
