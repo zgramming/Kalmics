@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +34,56 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   void initState() {
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      final players = context.read(globalAudioPlayers).state;
+
+      players.playerState.listen((event) {
+        log('4.) playerStateListen $event');
+        final _currentSong = context.read(currentSongProvider.state);
+        switch (event) {
+          case PlayerState.play:
+            context.read(currentSongProvider).playSong(_currentSong.song);
+            break;
+          case PlayerState.pause:
+            context.read(currentSongProvider).pauseSong();
+            break;
+          default:
+            context.read(currentSongProvider).stopSong();
+            break;
+        }
+      });
+
+      players.currentPosition.listen((currentDuration) {
+        final musics = context.read(musicProvider.state);
+
+        if (musics.isNotEmpty) {
+          context.read(currentSongProvider).setDuration(currentDuration);
+          final currentIndex = context.read(currentSongProvider.state).currentIndex;
+          final totalDuration =
+              context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
+          // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
+
+          /// Listen to current duration & total duration song
+          /// If current duration exceeds the total song duration, Then Play Next Song
+          if (currentDuration.inSeconds >= totalDuration) {
+            final musics = context.read(musicProvider.state);
+
+            /// Need Check Loop Mode
+            /// If Mode is looping
+            final result = context.read(currentSongProvider).nextSong(musics);
+            players.open(
+              Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
+              showNotification: true,
+              notificationSettings: sharedParameter.notificationSettings(
+                context,
+                musics: musics,
+              ),
+            );
+          }
+        }
+      });
+    });
+
     final watcher = DirectoryWatcher(ConstString.androidPathStorage);
     watcher.events.listen((event) {
       final file = File(event.path);
@@ -57,73 +108,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           configFlutterLocalNotification
               .showPlanNotification(
                 title: 'File Has Remove',
-                body: '$basename Detect has Remove to application',
+                body: '$basename Detect has Remove from application',
               )
               .then((_) => context.read(musicProvider).removeMusic(file.path));
         }
 
         ///* Detect if file has modify on storage
-        // if (event.type == ChangeType.MODIFY) {
-        //   configFlutterLocalNotification.showPlanNotification(
-        //     title: 'File Has Modify',
-        //     body: '$basename Detect has Modify to application',
-        //   );
-        // }
+
+        if (event.type == ChangeType.MODIFY) {
+          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+          configFlutterLocalNotification.showPlanNotification(
+            title: 'File Has Modify',
+            body: '$basename Detect has Modify to application',
+          );
+        }
       }
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      final players = context.read(globalAudioPlayers).state;
-      players.currentPosition.listen((currentDuration) {
-        context.read(currentSongProvider).setDuration(currentDuration);
-        final musics = context.read(musicProvider.state);
+    // WidgetsBinding.instance?.addPostFrameCallback((_) {
 
-        if (musics.isNotEmpty) {
-          final currentIndex = context.read(currentSongProvider.state).currentIndex;
-          final totalDuration =
-              context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
-          // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
+    //   });
 
-          /// Listen to current duration & total duration song
-          /// If current duration exceeds the total song duration, Then Play Next Song
-          ///
-          if (currentDuration.inSeconds >= totalDuration) {
-            final musics = context.read(musicProvider.state);
-
-            /// Need Check Loop Mode
-            /// If Mode is looping
-            final result = context.read(currentSongProvider).nextSong(musics);
-            players.open(
-              Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
-              showNotification: true,
-              notificationSettings: sharedParameter.notificationSettings(
-                context,
-                musics: musics,
-              ),
-            );
-          }
-        }
-      });
-
-      players.onErrorDo = (handler) {
-        log('1.) ${handler.error.message}\n2.)${handler.error.errorType}');
-      };
-      players.playerState.listen((state) {
-        log('4.) playerStateListen $state');
-        final _currentSong = context.read(currentSongProvider.state);
-        switch (state) {
-          case PlayerState.play:
-            context.read(currentSongProvider).playSong(_currentSong.song);
-            break;
-          case PlayerState.pause:
-            context.read(currentSongProvider).pauseSong();
-            break;
-          default:
-            context.read(currentSongProvider).stopSong();
-            break;
-        }
-      });
-    });
     super.initState();
   }
 
@@ -135,9 +140,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         builder: (context, watch, child) {
           final futureListMusic = watch(futureShowListMusic);
           return futureListMusic.when(
-            data: (_) {
-              return IndexedStack(index: _selectedIndex, children: screens);
-            },
+            data: (_) => IndexedStack(index: _selectedIndex, children: screens),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(
               child: Text(
