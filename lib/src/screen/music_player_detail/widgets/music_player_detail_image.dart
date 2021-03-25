@@ -1,6 +1,7 @@
-import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:kalmics/src/provider/my_provider.dart';
@@ -16,7 +17,7 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
   late Animation<double> _sizeAnimation;
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
       context.read(globalSizeAnimationController).state = _sizeController;
     });
     _sizeController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
@@ -35,34 +36,28 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.only(top: 16.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Consumer(
-          builder: (context, watch, child) {
-            final _currentSong = watch(currentSongProvider.state);
-            final artwork = _currentSong.song.artwork;
-            return SizeTransition(
-              sizeFactor: _sizeAnimation,
-              axis: Axis.horizontal,
-              child: Image.memory(
-                artwork ?? Uint8List.fromList([]),
+    return Consumer(
+      builder: (context, watch, child) {
+        final _currentSong = watch(currentSongProvider.state);
+        final artwork = _currentSong.song.artwork;
+        return SizeTransition(
+          sizeFactor: _sizeAnimation,
+          axis: Axis.horizontal,
+          child: Image.memory(
+            artwork ?? base64.decode(''),
+            fit: BoxFit.cover,
+            height: sizes.height(context),
+            width: sizes.width(context),
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
                 fit: BoxFit.cover,
                 width: sizes.width(context),
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
-                    fit: BoxFit.cover,
-                    width: sizes.width(context),
-                  );
-                },
-              ),
-            );
-          },
-        ),
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
