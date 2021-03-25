@@ -11,6 +11,7 @@ class SettingProvider extends StateNotifier<SettingModel> {
   static const _isPassedOnboardingKey = '_isPassedOnboardingKey';
   static const _sortByTypeKey = '_sortByTypeKey';
   static const _sortChoice = '_sortChoice';
+  static const _timerDuration = '_timerDuration';
 
   /// Save setting to flag user already success Onboardingscreen
   Future<void> setSettingOnboardingScreen({
@@ -34,6 +35,12 @@ class SettingProvider extends StateNotifier<SettingModel> {
     final box = Hive.box(boxSettingKey);
     box.put(_sortChoice, choice);
     state = state.copyWith(sortChoice: choice);
+  }
+
+  Future<void> setTimerDuration(Duration duration) async {
+    final box = Hive.box(boxSettingKey);
+    box.put(_timerDuration, duration);
+    state = state.copyWith(timerDuration: duration);
   }
 
   Future<void> readSettingProvider() async {

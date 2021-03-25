@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,3 +23,5 @@ final globalAudioPlayers = StateProvider<AssetsAudioPlayer>((ref) {
   final result = AssetsAudioPlayer.withId(uuid.v1());
   return result;
 });
+
+final globalTimer = StateProvider<Timer?>((ref) {});

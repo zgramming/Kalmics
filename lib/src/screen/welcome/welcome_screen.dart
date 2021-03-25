@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -32,9 +33,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     SettingScreen(),
   ];
 
+  Timer? timer;
+
   @override
   void initState() {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
+      // initialize [global_timer]
+      context.read(globalTimer).state = timer;
+
       final players = context.read(globalAudioPlayers).state;
 
       players.playerState.listen((event) {
@@ -84,7 +90,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       });
     });
 
-    final watcher = DirectoryWatcher(ConstString.androidPathStorage);
+    final watcher = DirectoryWatcher(ConstString.internalPathStorageAndroid);
     watcher.events.listen((event) {
       final file = File(event.path);
       final basename = file.path.split('/').last;
@@ -130,6 +136,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     //   });
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    context.read(globalTimer).state?.cancel();
+    super.dispose();
   }
 
   @override
