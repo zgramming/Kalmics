@@ -8,14 +8,15 @@ class MusicPlayerDetailTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     final _currentSong = watch(currentSongProvider.state);
+    final String artist = _currentSong.song.tag?.artist ?? '';
+    final String album = _currentSong.song.tag?.album ?? '';
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            _currentSong.song.tag?.title ?? 'Unknown Title',
+            _currentSong.song.title ?? 'Unknown Title',
             textAlign: TextAlign.center,
             maxLines: 2,
             style: GoogleFonts.montserrat(
@@ -27,7 +28,7 @@ class MusicPlayerDetailTitle extends ConsumerWidget {
           ),
           const SizedBox(height: 10.0),
           Text(
-            '${_currentSong.song.tag?.artist} - ${_currentSong.song.tag?.album}',
+            '${artist.isNotEmpty ? artist : 'Unknown Artists'} - ${album.isNotEmpty ? album : 'Unknown Album'}',
             maxLines: 2,
             textAlign: TextAlign.center,
             style: GoogleFonts.openSans(
@@ -35,7 +36,49 @@ class MusicPlayerDetailTitle extends ConsumerWidget {
               fontSize: sizes.width(context) / 35,
               color: Colors.white,
             ),
-          )
+          ),
+          const SizedBox(height: 10.0),
+          Expanded(
+            child: Align(
+              child: Wrap(
+                spacing: 20,
+                alignment: WrapAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: colorPallete.accentColor,
+                    ),
+                    child: const Icon(
+                      Icons.share,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: colorPallete.accentColor,
+                      ),
+                      child: const Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                      )),
+                  Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: colorPallete.accentColor,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt_rounded,
+                        color: Colors.white,
+                      )),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
