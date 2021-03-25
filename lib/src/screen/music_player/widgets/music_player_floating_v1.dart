@@ -32,7 +32,15 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
           return Visibility(
             visible: _currentSongIsFloating,
             child: InkWell(
-              onTap: () => Navigator.of(context).pushNamed(MusicPlayerDetailScreen.routeNamed),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (ctx) {
+                    return MusicPlayerDetailScreen();
+                  },
+                );
+              },
               child: Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.symmetric(
