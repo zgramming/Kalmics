@@ -13,7 +13,12 @@ class MusicPlayerDetailActionPlay extends ConsumerWidget {
       splashColor: colorPallete.accentColor,
       iconSize: sizes.width(context) / ConstSize.iconActionMusicPlayerDetail,
       color: Colors.white,
-      icon: Icon((_currentSong.isPlaying) ? Icons.pause_rounded : Icons.play_arrow_rounded),
+      icon: CircleAvatar(
+        radius: sizes.width(context),
+        child: Icon(
+          (_currentSong.isPlaying) ? Icons.pause_rounded : Icons.play_arrow_rounded,
+        ),
+      ),
       onPressed: () => players.playOrPause(),
     );
   }
