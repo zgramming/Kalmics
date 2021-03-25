@@ -1,5 +1,4 @@
-import 'dart:developer';
-import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
@@ -35,21 +34,22 @@ class MusicPlayerItem extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              onTap: () {
+              onTap: () async {
                 context.read(currentSongProvider).playSong(result, index: index);
                 final players = context.read(globalAudioPlayers).state;
-                players.open(
-                  Audio.file(
-                    result.pathFile ?? '',
-                    metas: sharedParameter.metas(result),
-                  ),
+                await players.open(
+                  Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
                   showNotification: true,
-                  notificationSettings: sharedParameter.notificationSettings(
-                    context,
-                    musics: music,
-                  ),
+                  notificationSettings:
+                      sharedParameter.notificationSettings(context, musics: music),
                 );
-                Navigator.of(context).pushNamed(MusicPlayerDetailScreen.routeNamed);
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (ctx) {
+                    return MusicPlayerDetailScreen();
+                  },
+                );
               },
               leading: Container(
                 width: 60,
@@ -62,7 +62,8 @@ class MusicPlayerItem extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Image.memory(
-                  artwork ?? Uint8List.fromList([]),
+                  artwork ?? base64.decode(''),
+                  fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return ShowImageAsset(
                         imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}');
@@ -70,7 +71,7 @@ class MusicPlayerItem extends ConsumerWidget {
                 ),
               ),
               title: Text(
-                result.tag?.title ?? '',
+                result.title!,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.openSans(
@@ -96,13 +97,6 @@ class MusicPlayerItem extends ConsumerWidget {
                   IconButton(
                     icon: const Icon(
                       Icons.favorite_outline_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.more_vert_rounded,
                       color: Colors.white,
                     ),
                     onPressed: () {},

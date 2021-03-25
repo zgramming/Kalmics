@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -35,7 +33,7 @@ class MusicPlayerList extends StatelessWidget {
                   ),
                 ),
                 MusicPlayerItem(music: _filteredMusic),
-                if (_currentSongProvider.song.idMusic.isNotEmpty) const SizedBox(height: 80)
+                if (_currentSongProvider.isFloating) const SizedBox(height: 80)
               ],
             ),
           );

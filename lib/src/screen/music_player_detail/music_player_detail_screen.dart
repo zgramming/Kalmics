@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ class MusicPlayerDetailScreen extends StatelessWidget {
               builder: (context, watch, child) {
                 final _currentSongProvider = watch(currentSongProvider.state);
                 return Image.memory(
-                  _currentSongProvider.song.artwork ?? Uint8List.fromList([]),
+                  _currentSongProvider.song.artwork ?? base64.decode(''),
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
@@ -48,20 +48,25 @@ class MusicPlayerDetailScreen extends StatelessWidget {
           Consumer(
             builder: (context, watch, child) {
               return SizedBox.expand(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 12.0,
-                    right: 12.0,
-                    top: sizes.statusBarHeight(context),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(flex: 4, child: MusicPlayerDetailImage()),
-                      Expanded(flex: 2, child: MusicPlayerDetailTitle()),
-                      Expanded(flex: 2, child: MusicPlayerDetailAction()),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                        flex: 4,
+                        child: Container(
+                            decoration: const BoxDecoration(color: Colors.transparent),
+                            child: MusicPlayerDetailImage())),
+                    Expanded(
+                        flex: 2,
+                        child: Container(
+                            decoration: const BoxDecoration(color: Colors.transparent),
+                            child: MusicPlayerDetailTitle())),
+                    Expanded(
+                        flex: 2,
+                        child: Container(
+                            decoration: const BoxDecoration(color: Colors.transparent),
+                            child: MusicPlayerDetailAction())),
+                  ],
                 ),
               );
             },
