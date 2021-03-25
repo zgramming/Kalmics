@@ -10,11 +10,10 @@ class SharedParameter {
   Metas metas(MusicModel music) {
     return Metas(
       id: music.idMusic,
-
       album: (music.tag?.album?.isNotEmpty ?? false) ? music.tag?.album : 'Unknown Album',
       artist: (music.tag?.artist?.isNotEmpty ?? false) ? music.tag?.artist : 'Unknown Artist',
       title: (music.title?.isNotEmpty ?? false) ? music.title : 'Unknown Title',
-      // image: MetasImage.file(File.fromRawPath(music.artwork ?? Uint8List.fromList([])).path),
+      // image: MetasImage.file(File.fromRawPath(music.artwork ?? base64.decode('')).path),
       onImageLoadFail: MetasImage.asset('${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}'),
     );
   }
@@ -39,9 +38,7 @@ class SharedParameter {
           ),
         );
       },
-      customPlayPauseAction: (player) {
-        player.playOrPause();
-      },
+      customPlayPauseAction: (player) => player.playOrPause(),
       customNextAction: (player) {
         final result = context.read(currentSongProvider).nextSong(musics);
         player.open(

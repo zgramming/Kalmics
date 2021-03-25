@@ -185,7 +185,7 @@ final futureShowListMusic = FutureProvider<void>((ref) async {
   /// Folder to find music for platform [android], Not yet support for IOS
   Directory dir = Directory('');
   if (Platform.isAndroid) {
-    dir = Directory(ConstString.androidPathStorage);
+    dir = Directory(ConstString.internalPathStorageAndroid);
   } else {
     /// This line for another Platform [IOS/WINDOWS/LINUX/etc...]
   }
