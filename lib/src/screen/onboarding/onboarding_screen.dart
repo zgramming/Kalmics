@@ -40,7 +40,7 @@ class OnboardingScreen extends StatelessWidget {
 
           context
               .read(settingProvider)
-              .saveSettingOnboardingScreen(value: true)
+              .setSettingOnboardingScreen(value: true)
               .then((_) => Navigator.of(context).pushNamed(WelcomeScreen.routeNamed));
         },
         items: [
