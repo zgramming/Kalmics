@@ -8,12 +8,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/config/my_config.dart';
-import 'package:kalmics/src/shared/my_shared.dart';
 import 'package:watcher/watcher.dart';
 
+import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
-
+import '../../shared/my_shared.dart';
 import '../home/home_screen.dart';
 import '../music_player/music_player_screen.dart';
 
@@ -73,10 +72,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           /// If current duration exceeds the total song duration, Then Play Next Song
           if (currentDuration.inSeconds >= totalDuration) {
             final musics = context.read(musicProvider.state);
+            final currentLoop = context.read(settingProvider.state).loopMode;
 
             /// Need Check Loop Mode
             /// If Mode is looping
-            final result = context.read(currentSongProvider).nextSong(musics);
+            final result = context.read(currentSongProvider).nextSong(
+                  musics,
+                  loopModeSetting: currentLoop,
+                  context: context,
+                  players: players,
+                );
             players.open(
               Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
               showNotification: true,

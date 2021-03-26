@@ -40,7 +40,13 @@ class SharedParameter {
       },
       customPlayPauseAction: (player) => player.playOrPause(),
       customNextAction: (player) {
-        final result = context.read(currentSongProvider).nextSong(musics);
+        final currentLoop = context.read(settingProvider.state).loopMode;
+        final result = context.read(currentSongProvider).nextSong(
+              musics,
+              loopModeSetting: currentLoop,
+              context: context,
+              players: player,
+            );
         player.open(
           Audio.file(
             result.pathFile ?? '',

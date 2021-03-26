@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kalmics/src/network/my_network.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:kalmics/src/shared/my_shared.dart';
 
 class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
   CurrentSongProvider([CurrentSongModel? state])
@@ -12,6 +15,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
               currentDuration: Duration.zero,
             ));
 
+  final sharedParameter = SharedParameter();
   void _setCurrentIndex(int index) {
     state = state.copyWith(currentIndex: index);
   }
@@ -54,7 +58,12 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     setDuration(Duration.zero);
   }
 
-  MusicModel nextSong(List<MusicModel> musics) {
+  MusicModel nextSong(
+    List<MusicModel> musics, {
+    required BuildContext context,
+    required AssetsAudioPlayer players,
+    required LoopModeSetting loopModeSetting,
+  }) {
     final lastIndex = musics.length - 1;
     final currentIndex = state.currentIndex;
     var nextIndex = 0;
@@ -64,8 +73,39 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
       /// else play next index song
       nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
     }
-    final nextSong = musics[nextIndex];
-    playSong(nextSong, index: nextIndex);
+    var nextSong = const MusicModel();
+    switch (loopModeSetting) {
+      case LoopModeSetting.all:
+        nextSong = musics[nextIndex];
+        playSong(nextSong, index: nextIndex);
+        players.open(
+          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            context,
+            musics: musics,
+          ),
+        );
+        break;
+      case LoopModeSetting.single:
+        nextSong = musics[currentIndex];
+        playSong(nextSong, index: currentIndex);
+        players.open(
+          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            context,
+            musics: musics,
+          ),
+        );
+        break;
+      case LoopModeSetting.none:
+        nextSong = const MusicModel();
+        stopSong();
+        players.stop();
+        break;
+      default:
+    }
 
     return nextSong;
   }
