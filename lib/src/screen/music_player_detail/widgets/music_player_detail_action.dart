@@ -21,7 +21,7 @@ class MusicPlayerDetailAction extends StatelessWidget {
             alignment: WrapAlignment.center,
             spacing: ConstSize.spacingIconMusicPlayerDetail,
             children: [
-              const MusicPlayerDetailActionShuffle(),
+              MusicPlayerDetailActionShuffle(),
               MusicPlayerDetailActionPrevious(),
               MusicPlayerDetailActionPlay(),
               MusicPlayerDetailActionNext(),
