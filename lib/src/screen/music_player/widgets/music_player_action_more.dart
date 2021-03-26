@@ -123,8 +123,10 @@ class MusicPlayerActionMore extends StatelessWidget {
                       ),
                       Consumer(
                         builder: (_, watch, __) {
-                          final ascending = watch(styleAscDescButton(0)).state;
-                          final descending = watch(styleAscDescButton(1)).state;
+                          final ascending =
+                              watch(styleAscDescButton(ConstString.ascendingValue)).state;
+                          final descending =
+                              watch(styleAscDescButton(ConstString.descendingValue)).state;
 
                           return Row(
                             children: [
