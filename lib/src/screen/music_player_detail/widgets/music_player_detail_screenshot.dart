@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -93,7 +92,7 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
                           top: 10,
                           left: 10,
                           child: CircleAvatar(
-                            radius: sizes.width(context) / 20,
+                            radius: sizes.width(context) / 30,
                             backgroundColor: Colors.transparent,
                             backgroundImage:
                                 AssetImage('${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}'),
@@ -106,7 +105,7 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
               ),
             ),
             ElevatedButton(
-              onPressed: () => _capture,
+              onPressed: _capture,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(20.0),
                 shape: const RoundedRectangleBorder(),
@@ -128,9 +127,13 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
 
     try {
       context.read(isLoading).state = true;
-      image = await boundary.toImage();
+      image = await boundary.toImage(pixelRatio: 3.0);
       catched = true;
     } catch (e) {
+      GlobalFunction.showSnackBar(
+        context,
+        content: Text(e.toString()),
+      );
       context.read(isLoading).state = false;
       Timer(const Duration(milliseconds: 200), () => _capture());
     }
