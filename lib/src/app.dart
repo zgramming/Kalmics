@@ -14,9 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Kalmics',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: SplashScreen(),
       onGenerateRoute: (settings) {
         if (settings.name == MusicPlayerScreen.routeNamed) {
