@@ -7,21 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kalmics/src/provider/my_provider.dart';
 
 class MusicPlayerDetailSlider extends StatelessWidget {
-  String _totalDurationSong(BuildContext context) {
-    final _currentSong = context.read(currentSongProvider.state);
-    final _musics = context.read(musicProvider.state);
-
-    var totalDurationInMinute = 0;
-    String _totalRemainingSecond = '';
-    final totalDuration = _musics[_currentSong.currentIndex].songDuration;
-    totalDurationInMinute = totalDuration?.inMinutes ?? 0;
-    final totalRemainingSecond = (totalDuration?.inSeconds ?? 0) % 60;
-    _totalRemainingSecond =
-        (totalRemainingSecond > 9) ? '$totalRemainingSecond' : '0$totalRemainingSecond';
-
-    return '$totalDurationInMinute.$_totalRemainingSecond';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -85,14 +70,19 @@ class MusicPlayerDetailSlider extends StatelessWidget {
               },
             ),
           ),
-          Text(
-            _totalDurationSong(context),
-            textAlign: TextAlign.center,
-            style: GoogleFonts.openSans(
-              color: Colors.white,
-              fontSize: 11.0,
-              fontWeight: FontWeight.w300,
-            ),
+          Consumer(
+            builder: (context, watch, child) {
+              final _totalDurationFormat = watch(totalDurationFormat).state;
+              return Text(
+                _totalDurationFormat,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.openSans(
+                  color: Colors.white,
+                  fontSize: 11.0,
+                  fontWeight: FontWeight.w300,
+                ),
+              );
+            },
           ),
         ],
       ),

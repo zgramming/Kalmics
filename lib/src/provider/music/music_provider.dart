@@ -105,6 +105,21 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
 
 final musicProvider = StateNotifierProvider((ref) => MusicProvider());
 
+final totalDurationFormat = StateProvider<String>((ref) {
+  final _currentSong = ref.watch(currentSongProvider.state);
+  final _musics = ref.watch(musicProvider.state);
+
+  var totalDurationInMinute = 0;
+  String _totalRemainingSecond = '';
+  final totalDuration = _musics[_currentSong.currentIndex].songDuration;
+  totalDurationInMinute = totalDuration?.inMinutes ?? 0;
+  final totalRemainingSecond = (totalDuration?.inSeconds ?? 0) % 60;
+  _totalRemainingSecond =
+      (totalRemainingSecond > 9) ? '$totalRemainingSecond' : '0$totalRemainingSecond';
+
+  return '$totalDurationInMinute.$_totalRemainingSecond';
+});
+
 final filteredMusic = StateProvider<List<MusicModel>>((ref) {
   final _searchQuery = ref.watch(searchQuery).state;
   final _musicProvider = ref.watch(musicProvider.state);
@@ -157,7 +172,17 @@ final filteredMusic = StateProvider<List<MusicModel>>((ref) {
       });
     }
   }
-  return result.isEmpty ? [] : result;
+
+  if (result.isEmpty) {
+    return [];
+  }
+
+  /// Shuffle Mode
+  if (_settingProvider.isShuffle) {
+    final tempListShuffle = [...result]..shuffle();
+    return tempListShuffle;
+  }
+  return result;
 });
 
 final totalMusic = StateProvider<int>((ref) {
