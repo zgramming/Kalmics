@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -105,7 +106,7 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
               ),
             ),
             ElevatedButton(
-              onPressed: () => _capture(),
+              onPressed: () => _capture,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(20.0),
                 shape: const RoundedRectangleBorder(),
@@ -119,19 +120,23 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
     );
   }
 
-  Future<String> _capture() async {
+  Future<void> _capture() async {
+    ui.Image? image;
+    bool catched = false;
+    final RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+
     try {
       context.read(isLoading).state = true;
-      final RenderRepaintBoundary? boundary =
-          _globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      image = await boundary.toImage();
+      catched = true;
+    } catch (e) {
+      context.read(isLoading).state = false;
+      Timer(const Duration(milliseconds: 200), () => _capture());
+    }
 
-      // if it needs repaint, we paint it.
-      if (boundary?.debugNeedsPaint ?? false) {
-        Timer(const Duration(seconds: 1), () => _capture());
-      }
-
-      final ui.Image image = await boundary!.toImage(pixelRatio: 3.0);
-      final ByteData byteData = (await image.toByteData(format: ui.ImageByteFormat.png))!;
+    if (catched) {
+      final ByteData byteData = (await image!.toByteData(format: ui.ImageByteFormat.png))!;
       final pngBytes = byteData.buffer.asUint8List();
 
       final dir = await getApplicationDocumentsDirectory();
@@ -139,9 +144,9 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
 
       final file = File(path);
       if (await file.exists()) {
-        file.delete(recursive: true);
+        await file.delete(recursive: true);
       } else {
-        file.create(recursive: true);
+        await file.create(recursive: true);
       }
 
       await file.writeAsBytes(pngBytes).then((_) => context.read(isLoading).state = false);
@@ -151,9 +156,6 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
         text: 'Saya sedang mendengarkan ${_currentSong.song.title}',
         subject: '',
       );
-      return file.path;
-    } catch (e) {
-      rethrow;
     }
   }
 }
