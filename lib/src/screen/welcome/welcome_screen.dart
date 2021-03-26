@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -135,76 +136,144 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         }
       }
     });
-
-    // WidgetsBinding.instance?.addPostFrameCallback((_) {
-
-    //   });
-
     super.initState();
   }
 
   @override
   void dispose() {
     context.read(globalTimer).state?.cancel();
+    context.read(globalAudioPlayers).state.dispose();
     super.dispose();
+  }
+
+  Future<void> minimizeApp() async {
+    try {
+      await ConstString.androidMinimizeChannel
+          .invokeMethod<bool>(ConstString.androidMinimizeFunction);
+    } on PlatformException catch (error) {
+      log('platformException ${error.code} || ${error.details} || ${error.message}');
+    } catch (e) {
+      log('catch ${e.toString()} ');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: colorPallete.primaryColor,
-      body: Consumer(
-        builder: (context, watch, child) {
-          final futureListMusic = watch(futureShowListMusic);
-          return futureListMusic.when(
-            data: (_) => IndexedStack(index: _selectedIndex, children: screens),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(
-              child: Text(
-                error.toString(),
-                style: GoogleFonts.montserrat(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+    return WillPopScope(
+      onWillPop: () {
+        showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Tunggu dulu',
+              style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+            ),
+            content: Consumer(
+              builder: (context, watch, child) {
+                final _currentSong = watch(currentSongProvider.state);
+                return Text.rich(
+                  TextSpan(
+                    text: 'Sepertinya kamu sedang mendengarkan ',
+                    children: [
+                      TextSpan(
+                        text: _currentSong.song.title,
+                        style: GoogleFonts.openSans(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: GoogleFonts.openSans(fontSize: 11),
+                );
+              },
+            ),
+            actions: [
+              OutlinedButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await minimizeApp();
+                },
+                style: OutlinedButton.styleFrom(primary: Colors.red),
+                child: Text(
+                  'Keluar Aplikasi',
+                  style: GoogleFonts.openSans(
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),
-        borderRadius: BorderRadius.circular(60),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.white,
-              width: 3,
-            ),
-            shape: BoxShape.circle,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(primary: colorPallete.accentColor),
+                child: Text(
+                  'Tetap disini',
+                  style: GoogleFonts.openSans(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+            ],
           ),
-          child: CircleAvatar(
-            backgroundColor: colorPallete.accentColor,
-            radius: sizes.width(context) / 12,
-            foregroundColor: Colors.white,
-            child: Icon(
-              Icons.music_note_rounded,
-              size: sizes.width(context) / 12,
+        );
+
+        return Future.value(true);
+      },
+      child: Scaffold(
+        backgroundColor: colorPallete.primaryColor,
+        body: Consumer(
+          builder: (context, watch, child) {
+            final futureListMusic = watch(futureShowListMusic);
+            return futureListMusic.when(
+              data: (_) => IndexedStack(index: _selectedIndex, children: screens),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) => Center(
+                child: Text(
+                  error.toString(),
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        floatingActionButton: InkWell(
+          onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),
+          borderRadius: BorderRadius.circular(60),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white,
+                width: 3,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: CircleAvatar(
+              backgroundColor: colorPallete.accentColor,
+              radius: sizes.width(context) / 12,
+              foregroundColor: Colors.white,
+              child: Icon(
+                Icons.music_note_rounded,
+                size: sizes.width(context) / 12,
+              ),
             ),
           ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBarWithFAB(
-        backgroundColor: const Color(0xFF190226),
-        selectedColor: Colors.white,
-        unSelectedColor: Colors.white.withOpacity(.6),
-        onTap: (currentIndex) {
-          setState(() => _selectedIndex = currentIndex);
-        },
-        items: [
-          BottomAppBarItem(iconData: Icons.home_rounded),
-          BottomAppBarItem(iconData: Icons.more_vert_rounded),
-        ],
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBarWithFAB(
+          backgroundColor: const Color(0xFF190226),
+          selectedColor: Colors.white,
+          unSelectedColor: Colors.white.withOpacity(.6),
+          onTap: (currentIndex) {
+            setState(() => _selectedIndex = currentIndex);
+          },
+          items: [
+            BottomAppBarItem(iconData: Icons.home_rounded),
+            BottomAppBarItem(iconData: Icons.more_vert_rounded),
+          ],
+        ),
       ),
     );
   }

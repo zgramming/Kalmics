@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 class ConstString {
   ///* Internal Storage platform android
   static const String internalPathStorageAndroid = '/storage/emulated/0/';
@@ -29,4 +31,8 @@ class ConstString {
   ///* Shuffle Value
   static const bool useShuffle = true;
   static const bool notUseShuffle = false;
+
+  ///* Method Channel
+  static const androidMinimizeChannel = MethodChannel('channel_minimize');
+  static const androidMinimizeFunction = 'minimize_app';
 }
