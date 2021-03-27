@@ -36,7 +36,21 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     state = state.copyWith(currentDuration: currentDuration);
   }
 
-  void playSong(
+  void resumeSong() {
+    _setPlaying(true);
+  }
+
+  void pauseSong() {
+    _setPlaying(false);
+  }
+
+  void stopSong() {
+    _setPlaying(false);
+    _setFloating(false);
+    setDuration(Duration.zero);
+  }
+
+  void _setInitSong(
     MusicModel music, {
     int? index,
     bool isPlaying = true,
@@ -48,14 +62,22 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     _setCurrentIndex(index ?? state.currentIndex);
   }
 
-  void pauseSong() {
-    _setPlaying(false);
-  }
-
-  void stopSong() {
-    _setPlaying(false);
-    _setFloating(false);
-    setDuration(Duration.zero);
+  void playSong(
+    MusicModel music, {
+    int currentIndex = 0,
+    required BuildContext context,
+    required AssetsAudioPlayer players,
+    required List<MusicModel> musics,
+  }) {
+    _setInitSong(music, index: currentIndex);
+    players.open(
+      Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
+      showNotification: true,
+      notificationSettings: sharedParameter.notificationSettings(
+        context,
+        musics: musics,
+      ),
+    );
   }
 
   MusicModel nextSong(
@@ -77,7 +99,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     switch (loopModeSetting) {
       case LoopModeSetting.all:
         nextSong = musics[nextIndex];
-        playSong(nextSong, index: nextIndex);
+        _setInitSong(nextSong, index: nextIndex);
         players.open(
           Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
           showNotification: true,
@@ -89,7 +111,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
         break;
       case LoopModeSetting.single:
         nextSong = musics[currentIndex];
-        playSong(nextSong, index: currentIndex);
+        _setInitSong(nextSong, index: currentIndex);
         players.open(
           Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
           showNotification: true,
@@ -106,11 +128,14 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
         break;
       default:
     }
-
     return nextSong;
   }
 
-  MusicModel previousSong(List<MusicModel> musics) {
+  MusicModel previousSong(
+    List<MusicModel> musics, {
+    required BuildContext context,
+    required AssetsAudioPlayer players,
+  }) {
     final lastIndex = musics.length - 1;
     final currentIndex = state.currentIndex;
     var nextIndex = 0;
@@ -121,9 +146,23 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
 
       nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
     }
-    final nextSong = musics[nextIndex];
-    playSong(nextSong, index: nextIndex);
-    return nextSong;
+    final previousSong = musics[nextIndex];
+
+    _setInitSong(previousSong, index: nextIndex);
+
+    players.open(
+      Audio.file(
+        previousSong.pathFile ?? '',
+        metas: sharedParameter.metas(previousSong),
+      ),
+      showNotification: true,
+      notificationSettings: sharedParameter.notificationSettings(
+        context,
+        musics: musics,
+      ),
+    );
+
+    return previousSong;
   }
 }
 
