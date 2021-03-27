@@ -56,10 +56,9 @@ class _MusicPlayerDetailTitleState extends State<MusicPlayerDetailTitle> {
                     children: [
                       InkWell(
                         onTap: () async {
-                          Share.shareFiles(
+                          await Share.shareFiles(
                             [_currentSong.song.pathFile ?? ''],
                             text: _currentSong.song.title,
-                            mimeTypes: ['mp3'],
                           );
                         },
                         child: Container(
