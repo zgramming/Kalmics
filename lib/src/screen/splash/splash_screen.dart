@@ -1,11 +1,14 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
 import 'package:global_template/global_template.dart';
-import 'package:kalmics/src/config/flutter_local_notification/flutter_local_notification.dart';
+
+import '../../config/flutter_local_notification/flutter_local_notification.dart';
+import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
+
 import '../onboarding/onboarding_screen.dart';
 import '../welcome/welcome_screen.dart';
 
@@ -15,6 +18,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  static const _logoTransparent = 'Kalmics-transparent.png';
   late AnimationController _sizeController;
   late Animation<double> _sizeAnimation;
   ConfigFlutterLocalNotification configFlutterLocalNotification = ConfigFlutterLocalNotification();
@@ -55,9 +59,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             sizeFactor: _sizeAnimation,
             axis: Axis.horizontal,
             child: SplashScreenTemplate(
-              backgroundColor: colorPallete.primaryColor,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  ...ConstColor.backgroundColorGradient(),
+                ],
+              ),
               image: ShowImageAsset(
-                imageUrl: "${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}",
+                imageUrl: "${appConfig.urlImageAsset}/$_logoTransparent",
               ),
               navigateAfterSplashScreen: (ctx) {
                 if (setting.isPassedOnboarding) {

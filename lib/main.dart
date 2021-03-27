@@ -33,7 +33,7 @@ Future<void> main() async {
   await Hive.openBox(SettingProvider.boxSettingKey);
   colorPallete.configuration(
     primaryColor: const Color(0xFF52057b),
-    accentColor: const Color(0xFFA70071),
+    accentColor: const Color(0xFF7B0569),
     monochromaticColor: const Color(0xFF7307AC),
     onboardingColor1: const Color(0xFFDE385E),
     onboardingColor2: const Color(0xFFA70071),

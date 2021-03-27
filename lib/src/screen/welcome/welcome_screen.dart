@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kalmics/src/config/my_config.dart';
 
 import '../../provider/my_provider.dart';
 import '../../shared/my_shared.dart';
@@ -51,24 +52,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return WillPopScope(
       onWillPop: () => SharedFunction.onBackButtonPressed(context),
       child: Scaffold(
-        backgroundColor: colorPallete.primaryColor,
-        body: Consumer(
-          builder: (context, watch, child) {
-            final futureListMusic = watch(futureShowListMusic);
-            return futureListMusic.when(
-              data: (_) => IndexedStack(index: _selectedIndex, children: screens),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(
-                child: Text(
-                  error.toString(),
-                  style: GoogleFonts.montserrat(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                ...ConstColor.backgroundColorGradient(),
+              ],
+            ),
+          ),
+          child: Consumer(
+            builder: (context, watch, child) {
+              final futureListMusic = watch(futureShowListMusic);
+              return futureListMusic.when(
+                data: (_) => IndexedStack(index: _selectedIndex, children: screens),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stackTrace) => Center(
+                  child: Text(
+                    error.toString(),
+                    style: GoogleFonts.montserrat(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
         floatingActionButton: InkWell(
           onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),
@@ -97,9 +108,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           backgroundColor: const Color(0xFF190226),
           selectedColor: Colors.white,
           unSelectedColor: Colors.white.withOpacity(.6),
-          onTap: (currentIndex) {
-            setState(() => _selectedIndex = currentIndex);
-          },
+          onTap: (currentIndex) => setState(() => _selectedIndex = currentIndex),
           items: [
             BottomAppBarItem(iconData: Icons.home_rounded),
             BottomAppBarItem(iconData: Icons.more_vert_rounded),
