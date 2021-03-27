@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+
+import '../../provider/my_provider.dart';
+
+import './widget/home_favorite_song.dart';
+import './widget/home_pageview_recent_play.dart';
+import 'widget/home_floating_player.dart';
 
 const urlImageTesting = 'https://homepages.cae.wisc.edu/~ece533/images/girl.png';
 
@@ -53,55 +58,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  final _pageController = PageController(viewportFraction: .5);
-  int _currentIndexPageView = 0;
-  int _previousIndexPageView = -1;
-  int _nextIndexPageView = 0;
-
-  late AnimationController animationController;
-  late Animation<double> mainScalePageView;
-  late Animation<double> anotherScalePageView;
-
-  void setCurrentIndex(int index, int totalList) {
-    setState(() {
-      if (index - 1 > -1) {
-        _previousIndexPageView = index - 1;
-      }
-
-      if (index + 1 < totalList) {
-        _nextIndexPageView = index + 1;
-      }
-
-      _currentIndexPageView = index;
-    });
-  }
-
-  @override
-  void initState() {
-    animationController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    mainScalePageView = Tween<double>(begin: .6, end: 1).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: Curves.fastOutSlowIn,
-      ),
-    );
-    anotherScalePageView = Tween<double>(begin: 1, end: .6).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: Curves.fastOutSlowIn,
-      ),
-    );
-
-    animationController.forward();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -111,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         right: 16.0,
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           SizedBox.expand(
             child: SingleChildScrollView(
@@ -119,104 +76,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 children: [
                   LineChartSample2(),
                   const SizedBox(height: 20),
-                  Text(
-                    'Baru saja diputar',
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  HomePageViewRecentPlay(),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    height: sizes.height(context) / 3,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: listRecentPlay.length,
-                      onPageChanged: (index) {
-                        setCurrentIndex(index, listRecentPlay.length);
-                        animationController.reset();
-                        animationController.forward();
-                      },
-                      itemBuilder: (_, index) {
-                        final result = listRecentPlay[index];
-
-                        var margin = EdgeInsets.zero;
-                        if (index != _currentIndexPageView) {
-                          if (index == _previousIndexPageView) {
-                            margin = const EdgeInsets.only(left: 24);
-                          }
-                          if (index == _nextIndexPageView) {
-                            margin = const EdgeInsets.only(right: 24);
-                          }
-                        }
-
-                        return AnimatedBuilder(
-                          animation: animationController,
-                          builder: (_, child) {
-                            return Transform.scale(
-                              scale: index == _currentIndexPageView
-                                  ? mainScalePageView.value
-                                  : anotherScalePageView.value,
-                              child: child,
-                            );
-                          },
-                          child: Container(
-                            margin: margin,
-                            child: ShowImageNetwork(
-                              imageUrl: result.imageUrl,
-                              imageBorderRadius: BorderRadius.circular(10),
-                              imageSize: 1,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Lagu Favoritku',
-                        style: GoogleFonts.montserrat(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Lihat Selengkapnya',
-                        style: GoogleFonts.openSans(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w300,
-                          fontSize: 10,
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: sizes.height(context) / 8,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: listRecentPlay.length,
-                      shrinkWrap: true,
-                      itemExtent: sizes.width(context) / 4,
-                      itemBuilder: (context, index) {
-                        final result = listRecentPlay[index];
-                        return SizedBox(
-                          child: ShowImageNetwork(
-                            padding: const EdgeInsets.all(8.0),
-                            imageUrl: result.imageUrl,
-                            imageBorderRadius: BorderRadius.circular(10),
-                            imageSize: 1,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  const HomeFavoriteSong(),
                   Consumer(
                     builder: (context, watch, child) {
                       final _currengSongProvider = watch(currentSongProvider.state);
@@ -231,28 +93,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-          Consumer(
-            builder: (context, watch, child) {
-              final _currengSongProvider = watch(currentSongProvider.state);
-              final _currentSongIsPlaying = _currengSongProvider.song.idMusic.isNotEmpty;
-
-              if (_currentSongIsPlaying) {
-                return Positioned(
-                  bottom: 10,
-                  right: 0,
-                  child: Container(
-                    height: sizes.height(context) / 10,
-                    width: sizes.width(context) / 3,
-                    decoration: BoxDecoration(
-                      color: colorPallete.accentColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox();
-            },
-          )
+          const HomeFloatingPlayer()
         ],
       ),
     );
