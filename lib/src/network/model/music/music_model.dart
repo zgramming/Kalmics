@@ -5,17 +5,17 @@ import 'package:equatable/equatable.dart';
 
 class MusicModel extends Equatable {
   final String idMusic;
-  final Tag? tag;
   final String? title;
-  final Uint8List? artwork;
   final String? pathFile;
+  final Tag? tag;
+  final Uint8List? artwork;
   final Duration? songDuration;
   const MusicModel({
     this.idMusic = '',
-    this.tag,
     this.title,
-    this.artwork,
     this.pathFile,
+    this.tag,
+    this.artwork,
     this.songDuration,
   });
   @override

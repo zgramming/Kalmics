@@ -13,7 +13,13 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: OnboardingPage(
-        backgroundOnboarding: colorPallete.primaryColor,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ...ConstColor.backgroundColorGradient(),
+          ],
+        ),
         onPageChanged: (index) {},
         onClickNext: (index) {},
         onClickFinish: () async {
