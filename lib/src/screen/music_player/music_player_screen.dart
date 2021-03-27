@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
-import './widgets/music_player_action_more.dart';
+
 import './widgets/music_player_floating_v1.dart';
 import './widgets/music_player_list.dart';
-import './widgets/music_player_toggle_search.dart';
+
+import 'widgets/music_player_appbar.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
   static const routeNamed = '/music-player-screen';
@@ -25,23 +26,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorPallete.primaryColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Kalmics',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            fontSize: 24,
-          ),
-        ),
-        actions: [
-          const MusicPlayerToggleSearch(),
-          MusicPlayerActionMore(),
-        ],
-      ),
       body: ProviderListener<StateController<bool>>(
         provider: isLoading,
         onChange: (context, value) {
@@ -56,24 +40,36 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             FocusScope.of(context).unfocus();
             context.read(globalSearch).state = false;
           },
-          child: Stack(
-            children: [
-              MusicPlayerList(),
-              const FloatingMusicPlayerV1(),
-              Consumer(
-                builder: (context, watch, child) {
-                  final isSearch = watch(globalSearch).state;
-                  if (isSearch) {
-                    return SizedBox.expand(
-                      child: Container(
-                        color: Colors.black45,
-                      ),
-                    );
-                  }
-                  return const SizedBox();
-                },
-              )
-            ],
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  ...ConstColor.backgroundColorGradient(),
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                MusicPlayerList(),
+                const FloatingMusicPlayerV1(),
+                const MusicPlayerAppBar(),
+                Consumer(
+                  builder: (context, watch, child) {
+                    final isSearch = watch(globalSearch).state;
+                    if (isSearch) {
+                      return SizedBox.expand(
+                        child: Container(
+                          color: Colors.black45,
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

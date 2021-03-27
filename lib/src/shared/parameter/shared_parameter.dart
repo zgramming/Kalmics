@@ -22,42 +22,38 @@ class SharedParameter {
     BuildContext context, {
     required List<MusicModel> musics,
   }) {
-    final sharedParameter = SharedParameter();
     return NotificationSettings(
       customPrevAction: (players) {
-        final result = context.read(currentSongProvider).previousSong(musics);
-        players.open(
-          Audio.file(
-            result.pathFile ?? '',
-            metas: sharedParameter.metas(result),
-          ),
-          showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
-            context,
-            musics: musics,
-          ),
-        );
+        context.read(currentSongProvider).previousSong(
+              musics,
+              context: context,
+              players: players,
+            );
       },
-      customPlayPauseAction: (player) => player.playOrPause(),
+      customPlayPauseAction: (player) {
+        player.playOrPause();
+        player.playerState.listen((state) {
+          switch (state) {
+            case PlayerState.play:
+              context.read(currentSongProvider).resumeSong();
+              break;
+            case PlayerState.pause:
+              context.read(currentSongProvider).pauseSong();
+              break;
+            default:
+              context.read(currentSongProvider).stopSong();
+              break;
+          }
+        });
+      },
       customNextAction: (player) {
         final currentLoop = context.read(settingProvider.state).loopMode;
-        final result = context.read(currentSongProvider).nextSong(
+        context.read(currentSongProvider).nextSong(
               musics,
               loopModeSetting: currentLoop,
               context: context,
               players: player,
             );
-        player.open(
-          Audio.file(
-            result.pathFile ?? '',
-            metas: sharedParameter.metas(result),
-          ),
-          showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
-            context,
-            musics: musics,
-          ),
-        );
       },
       customStopAction: (player) {
         context.read(currentSongProvider).stopSong();

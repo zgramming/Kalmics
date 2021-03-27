@@ -70,22 +70,6 @@ class SharedFunction {
 
     final players = context.read(globalAudioPlayers).state;
 
-    players.playerState.listen((event) {
-      log('4.) playerStateListen $event');
-      final _currentSong = context.read(currentSongProvider.state);
-      switch (event) {
-        case PlayerState.play:
-          context.read(currentSongProvider).playSong(_currentSong.song);
-          break;
-        case PlayerState.pause:
-          context.read(currentSongProvider).pauseSong();
-          break;
-        default:
-          context.read(currentSongProvider).stopSong();
-          break;
-      }
-    });
-
     players.currentPosition.listen((currentDuration) {
       final musics = context.read(musicProvider.state);
 

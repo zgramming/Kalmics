@@ -19,7 +19,11 @@ class MusicPlayerDetailActionPrevious extends ConsumerWidget {
         _globalAnimation?.reset();
 
         Future.delayed(const Duration(milliseconds: 200), () {
-          final result = context.read(currentSongProvider).previousSong(_musics);
+          final result = context.read(currentSongProvider).previousSong(
+                _musics,
+                context: context,
+                players: players,
+              );
           players.open(
             Audio.file(
               result.pathFile ?? '',

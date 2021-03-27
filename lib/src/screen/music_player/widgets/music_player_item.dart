@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -12,18 +11,20 @@ import '../../../provider/my_provider.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
 
 class MusicPlayerItem extends ConsumerWidget {
-  final List<MusicModel> music;
+  final List<MusicModel> musics;
 
-  MusicPlayerItem({required this.music});
+  MusicPlayerItem({
+    required this.musics,
+  });
   final sharedParameter = SharedParameter();
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: music.length,
+      itemCount: musics.length,
       itemBuilder: (context, index) {
-        final result = music[index];
+        final result = musics[index];
         final artis = result.tag?.artist;
         final artwork = result.artwork;
         final durationInMinute = result.songDuration?.inMinutes;
@@ -35,14 +36,15 @@ class MusicPlayerItem extends ConsumerWidget {
           children: [
             ListTile(
               onTap: () async {
-                context.read(currentSongProvider).playSong(result, index: index);
                 final players = context.read(globalAudioPlayers).state;
-                await players.open(
-                  Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
-                  showNotification: true,
-                  notificationSettings:
-                      sharedParameter.notificationSettings(context, musics: music),
-                );
+                context.read(currentSongProvider).playSong(
+                      result,
+                      context: context,
+                      players: players,
+                      musics: musics,
+                      currentIndex: index,
+                    );
+
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -104,11 +106,12 @@ class MusicPlayerItem extends ConsumerWidget {
                 ],
               ),
             ),
-            Divider(
-              color: Colors.white.withOpacity(.5),
-              endIndent: 15,
-              indent: 15,
-            ),
+            if (musics.length - 1 != index)
+              Divider(
+                color: Colors.white.withOpacity(.5),
+                endIndent: 15,
+                indent: 15,
+              ),
           ],
         );
       },

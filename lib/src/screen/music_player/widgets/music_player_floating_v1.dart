@@ -17,7 +17,9 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 0,
+      bottom: 10,
+      right: 10,
+      left: 10,
       child: Consumer(
         builder: (context, watch, child) {
           final players = context.read(globalAudioPlayers).state;
@@ -47,9 +49,13 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                   horizontal: sizes.width(context) / 15,
                   vertical: 12,
                 ),
-                height: 80,
+                height: kToolbarHeight * 1.5,
                 width: sizes.width(context),
-                color: colorPallete.accentColor,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(60),
+                  color: colorPallete.accentColor,
+                ),
                 child: Row(
                   children: [
                     Expanded(
