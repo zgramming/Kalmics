@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_template/global_template.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'screen/music_player/music_player_screen.dart';
 import 'screen/music_player_detail/music_player_detail_screen.dart';
@@ -14,6 +15,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Kalmics',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: colorPallete.primaryColor,
+        accentColor: colorPallete.accentColor,
+        textTheme: GoogleFonts.openSansTextTheme(),
+      ),
       home: SplashScreen(),
       onGenerateRoute: (settings) {
         if (settings.name == MusicPlayerScreen.routeNamed) {
@@ -26,7 +32,7 @@ class MyApp extends StatelessWidget {
             screen: (ctx, animation, secondaryAnimation) => MusicPlayerDetailScreen(),
           );
         } else if (settings.name == WelcomeScreen.routeNamed) {
-          return routeAnimation.fadeTransition(
+          return routeAnimation.scaleTransition(
             screen: (ctx, __, ___) => WelcomeScreen(),
           );
         }

@@ -6,6 +6,7 @@ enum LoopModeSetting { all, single, none }
 class SettingModel extends Equatable {
   final bool isPassedOnboarding;
   final bool isShuffle;
+  final bool isFirstLoad;
   final LoopModeSetting loopMode;
   final Duration timerDuration;
   final SortByType sortByType;
@@ -13,6 +14,7 @@ class SettingModel extends Equatable {
   const SettingModel({
     this.isPassedOnboarding = false,
     this.isShuffle = false,
+    this.isFirstLoad = true,
     this.loopMode = LoopModeSetting.all,
     this.timerDuration = Duration.zero,
     this.sortByType = SortByType.ascending,
@@ -24,6 +26,7 @@ class SettingModel extends Equatable {
     return [
       isPassedOnboarding,
       isShuffle,
+      isFirstLoad,
       loopMode,
       timerDuration,
       sortByType,
@@ -37,6 +40,7 @@ class SettingModel extends Equatable {
   SettingModel copyWith({
     bool? isPassedOnboarding,
     bool? isShuffle,
+    bool? isFirstLoad,
     LoopModeSetting? loopMode,
     Duration? timerDuration,
     SortByType? sortByType,
@@ -45,6 +49,7 @@ class SettingModel extends Equatable {
     return SettingModel(
       isPassedOnboarding: isPassedOnboarding ?? this.isPassedOnboarding,
       isShuffle: isShuffle ?? this.isShuffle,
+      isFirstLoad: isFirstLoad ?? this.isFirstLoad,
       loopMode: loopMode ?? this.loopMode,
       timerDuration: timerDuration ?? this.timerDuration,
       sortByType: sortByType ?? this.sortByType,

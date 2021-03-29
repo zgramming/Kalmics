@@ -32,7 +32,26 @@ class ConstString {
   static const bool useShuffle = true;
   static const bool notUseShuffle = false;
 
+  ///* First Load Value
+  static const bool isFirstLoad = true;
+  static const bool isNotFirstLoad = false;
+
+  ///* ID AssetAudioPlayer
+  static const String idAssetAudioPlayer = 'zeffry.ganteng';
+
   ///* Method Channel
   static const androidMinimizeChannel = MethodChannel('channel_minimize');
   static const androidMinimizeFunction = 'minimize_app';
+
+  ///? Setting Screen
+  ///* Word [Give Rating]
+  static const giveRating = 'Berikan Rating';
+
+  static const urlFacebook = 'https://www.facebook.com/zeffry.reynando/';
+  static const urlGithub = 'https://github.com/zgramming';
+  static const urlGmail = 'zeffry.reynando@gmail.com';
+  static const urlLinkedIn = 'https://www.linkedin.com/in/zeffry-reynando/';
+  static const urlInstagram = 'https://www.instagram.com/zeffry_reynando/';
+  static const subjectEmail = 'Kalmics App';
+  static const bodyEmail = 'Hello Zeffry Reynando !';
 }

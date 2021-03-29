@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -17,9 +15,8 @@ class HomeFloatingPlayer extends StatelessWidget {
     return Consumer(
       builder: (context, watch, child) {
         final _currengSongProvider = watch(currentSongProvider.state);
-        final _currentSongIsPlaying = _currengSongProvider.song.idMusic.isNotEmpty;
-
-        if (_currentSongIsPlaying) {
+        final _currentSongIsFloating = _currengSongProvider.isFloating;
+        if (_currentSongIsFloating) {
           return Positioned(
             bottom: 10,
             right: 0,
@@ -34,10 +31,22 @@ class HomeFloatingPlayer extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: Image.memory(
-                      _currengSongProvider.song.artwork ?? base64.decode(''),
-                      fit: BoxFit.cover,
-                    ),
+                    child: _currengSongProvider.song.artwork == null
+                        ? ShowImageAsset(
+                            imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                            fit: BoxFit.cover,
+                          )
+                        : Image.memory(
+                            _currengSongProvider.song.artwork!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                fit: BoxFit.cover,
+                                width: sizes.width(context),
+                              );
+                            },
+                          ),
                   ),
                 ),
                 InkWell(
@@ -59,7 +68,7 @@ class HomeFloatingPlayer extends StatelessWidget {
                     ),
                     child: Text(
                       _currengSongProvider.song.title ?? 'Unknown Song',
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.openSans(
                         fontWeight: FontWeight.bold,

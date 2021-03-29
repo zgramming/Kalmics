@@ -76,32 +76,16 @@ class SharedFunction {
       if (musics.isNotEmpty) {
         context.read(currentSongProvider).setDuration(currentDuration);
         final currentIndex = context.read(currentSongProvider.state).currentIndex;
-        final totalDuration =
-            context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
-        // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
+        if (currentIndex >= 0) {
+          final totalDuration =
+              context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
+          // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
 
-        /// Listen to current duration & total duration song
-        /// If current duration exceeds the total song duration, Then Play Next Song
-        if (currentDuration.inSeconds >= totalDuration) {
-          final musics = context.read(musicProvider.state);
-          final currentLoop = context.read(settingProvider.state).loopMode;
-
-          /// Need Check Loop Mode
-          /// If Mode is looping
-          final result = context.read(currentSongProvider).nextSong(
-                musics,
-                loopModeSetting: currentLoop,
-                context: context,
-                players: players,
-              );
-          players.open(
-            Audio.file(result.pathFile ?? '', metas: sharedParameter.metas(result)),
-            showNotification: true,
-            notificationSettings: sharedParameter.notificationSettings(
-              context,
-              musics: musics,
-            ),
-          );
+          /// Listen to current duration & total duration song
+          /// If current duration exceeds the total song duration, Then Play Next Song
+          if (currentDuration.inSeconds >= totalDuration) {
+            context.refresh(nextSong);
+          }
         }
       }
     });

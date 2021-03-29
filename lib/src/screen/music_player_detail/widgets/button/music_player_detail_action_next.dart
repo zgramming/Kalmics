@@ -16,14 +16,10 @@ class MusicPlayerDetailActionNext extends ConsumerWidget {
         final _globalAnimation = context.read(globalSizeAnimationController).state;
         _globalAnimation?.reset();
         Future.delayed(const Duration(milliseconds: 200), () {
-          final currentLoop = context.read(settingProvider.state).loopMode;
-          context.read(currentSongProvider).nextSong(
-                _musics,
-                loopModeSetting: currentLoop,
-                context: context,
-                players: players,
-              );
+          context.refresh(nextSong);
 
+          ///* Add History Recent Play
+          // context.read(recentPlayProvider).add(result);
           _globalAnimation?.forward();
         });
       },

@@ -62,9 +62,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  ...ConstColor.backgroundColorGradient(),
-                ],
+                colors: ConstColor.backgroundColorGradient(),
               ),
               image: ShowImageAsset(
                 imageUrl: "${appConfig.urlImageAsset}/$_logoTransparent",

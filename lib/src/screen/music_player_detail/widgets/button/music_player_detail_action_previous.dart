@@ -1,4 +1,3 @@
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,35 +5,18 @@ import '../../../../config/my_config.dart';
 import '../../../../provider/my_provider.dart';
 import '../../../../shared/my_shared.dart';
 
-class MusicPlayerDetailActionPrevious extends ConsumerWidget {
+class MusicPlayerDetailActionPrevious extends StatelessWidget {
   final SharedParameter sharedParameter = SharedParameter();
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final players = watch(globalAudioPlayers).state;
-    final _musics = watch(musicProvider.state);
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         final _globalAnimation = context.read(globalSizeAnimationController).state;
         _globalAnimation?.reset();
 
         Future.delayed(const Duration(milliseconds: 200), () {
-          final result = context.read(currentSongProvider).previousSong(
-                _musics,
-                context: context,
-                players: players,
-              );
-          players.open(
-            Audio.file(
-              result.pathFile ?? '',
-              metas: sharedParameter.metas(result),
-            ),
-            showNotification: true,
-            notificationSettings: sharedParameter.notificationSettings(
-              context,
-              musics: _musics,
-            ),
-          );
+          context.refresh(previousSong);
           _globalAnimation?.forward();
         });
       },

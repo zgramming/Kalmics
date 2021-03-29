@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+
+import '../../../provider/my_provider.dart';
 
 class MusicPlayerDetailImage extends StatefulWidget {
   @override
@@ -43,19 +42,25 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
         return SizeTransition(
           sizeFactor: _sizeAnimation,
           axis: Axis.horizontal,
-          child: Image.memory(
-            artwork ?? base64.decode(''),
-            fit: BoxFit.cover,
-            height: sizes.height(context),
-            width: sizes.width(context),
-            errorBuilder: (context, error, stackTrace) {
-              return Image.asset(
-                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
-                fit: BoxFit.cover,
-                width: sizes.width(context),
-              );
-            },
-          ),
+          child: artwork == null
+              ? Image.asset(
+                  '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                  fit: BoxFit.cover,
+                  width: sizes.width(context),
+                )
+              : Image.memory(
+                  artwork,
+                  fit: BoxFit.cover,
+                  height: sizes.height(context),
+                  width: sizes.width(context),
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                      fit: BoxFit.cover,
+                      width: sizes.width(context),
+                    );
+                  },
+                ),
         );
       },
     );

@@ -9,7 +9,14 @@ class MusicPlayerDetailActionPlay extends ConsumerWidget {
     final players = watch(globalAudioPlayers).state;
     final _currentSong = watch(currentSongProvider.state);
     return InkWell(
-      onTap: () => players.playOrPause(),
+      onTap: () {
+        players.playOrPause();
+        if (_currentSong.isPlaying) {
+          context.read(currentSongProvider).pauseSong();
+          return;
+        }
+        context.read(currentSongProvider).resumeSong();
+      },
       child: CircleAvatar(
         foregroundColor: Colors.white,
         radius: ConstSize.radiusIconActionMusicPlayerDetail(context),

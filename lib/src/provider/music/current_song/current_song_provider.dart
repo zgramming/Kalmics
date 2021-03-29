@@ -1,0 +1,199 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kalmics/src/network/my_network.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:kalmics/src/provider/global/global_provider.dart';
+import 'package:kalmics/src/provider/music/music/music_provider.dart';
+import 'package:kalmics/src/provider/music/recent_play/recent_play_provider.dart';
+import 'package:kalmics/src/provider/my_provider.dart';
+import 'package:kalmics/src/shared/my_shared.dart';
+
+class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
+  CurrentSongProvider([CurrentSongModel? state])
+      : super(state ??
+            CurrentSongModel(
+              song: MusicModel(),
+              isPlaying: false,
+              isFloating: false,
+              currentIndex: -1,
+              currentDuration: Duration.zero,
+            ));
+
+  void _setCurrentIndex(int index) {
+    state = state.copyWith(currentIndex: index);
+  }
+
+  void _setPlaying(bool value) {
+    state = state.copyWith(isPlaying: value);
+  }
+
+  void _setFloating(bool value) {
+    state = state.copyWith(isFloating: value);
+  }
+
+  void _setCurrentSong(MusicModel music) {
+    state = state.copyWith(song: music);
+  }
+
+  void setDuration(Duration currentDuration) {
+    state = state.copyWith(currentDuration: currentDuration);
+  }
+
+  void resumeSong() {
+    _setPlaying(true);
+  }
+
+  void pauseSong() {
+    _setPlaying(false);
+  }
+
+  void stopSong() {
+    _setPlaying(false);
+    _setFloating(false);
+    setDuration(Duration.zero);
+  }
+
+  void _setInitSong(
+    MusicModel music, {
+    int? index,
+    bool isPlaying = true,
+    bool isFloating = true,
+  }) {
+    _setCurrentSong(music);
+    _setPlaying(isPlaying);
+    _setFloating(isFloating);
+    _setCurrentIndex(index ?? state.currentIndex);
+  }
+}
+
+final currentSongProvider = StateNotifierProvider((ref) => CurrentSongProvider());
+
+final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
+  final _musics = ref.read(musicProvider.state);
+  final _players = ref.read(globalAudioPlayers).state;
+  final _globalContext = ref.read(globalContext).state;
+  final _currentSongProvider = ref.read(currentSongProvider);
+  final _recentPlayProvider = ref.read(recentPlayProvider);
+
+  final sharedParameter = SharedParameter();
+
+  final music = map['music'] as MusicModel;
+  final currentIndex = map['index'] as int;
+
+  await _players.open(
+    Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
+    showNotification: true,
+    notificationSettings: sharedParameter.notificationSettings(
+      _globalContext!,
+      musics: _musics,
+    ),
+  );
+
+  _currentSongProvider._setInitSong(music, index: currentIndex);
+
+  ///* Save History Recents Play
+  _recentPlayProvider.add(music);
+});
+
+final previousSong = FutureProvider<MusicModel>((ref) async {
+  final _globalContext = ref.read(globalContext).state;
+  final _musics = ref.read(musicProvider.state);
+  final _players = ref.read(globalAudioPlayers).state;
+  final _currentSongProvider = ref.read(currentSongProvider);
+  final _currentSong = ref.read(currentSongProvider.state);
+  final _recentPlayProvider = ref.read(recentPlayProvider);
+
+  final sharedParameter = SharedParameter();
+
+  final lastIndex = _musics.length - 1;
+  final currentIndex = _currentSong.currentIndex;
+  var nextIndex = 0;
+  if (_musics.length > 1) {
+    /// Check if current index - 1 is Negative
+    /// if [true] play last index song
+    /// else play previous index song
+
+    nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
+  }
+  final previousSong = _musics[nextIndex];
+
+  await _players.open(
+    Audio.file(
+      previousSong.pathFile ?? '',
+      metas: sharedParameter.metas(previousSong),
+    ),
+    showNotification: true,
+    notificationSettings: sharedParameter.notificationSettings(
+      _globalContext!,
+      musics: _musics,
+    ),
+  );
+  _currentSongProvider._setInitSong(previousSong, index: nextIndex);
+
+  ///* Save History Recents Play
+  _recentPlayProvider.add(previousSong);
+
+  return previousSong;
+});
+
+final nextSong = FutureProvider<MusicModel>((ref) async {
+  final _globalContext = ref.read(globalContext).state;
+  final _musics = ref.read(musicProvider.state);
+  final _players = ref.read(globalAudioPlayers).state;
+  final _currentSongProvider = ref.read(currentSongProvider);
+  final _currentSong = ref.read(currentSongProvider.state);
+  final _recentPlayProvider = ref.read(recentPlayProvider);
+  final loopModeSetting = ref.read(settingProvider.state).loopMode;
+
+  final sharedParameter = SharedParameter();
+
+  final lastIndex = _musics.length - 1;
+  final currentIndex = _currentSong.currentIndex;
+  var nextIndex = 0;
+  if (_musics.length > 1) {
+    /// Check if current index + 1 exceeds the last index
+    /// if [true] play first index song
+    /// else play next index song
+    nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
+  }
+  var nextSong = MusicModel();
+  switch (loopModeSetting) {
+    case LoopModeSetting.all:
+      nextSong = _musics[nextIndex];
+
+      await _players.open(
+        Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+        showNotification: true,
+        notificationSettings: sharedParameter.notificationSettings(
+          _globalContext!,
+          musics: _musics,
+        ),
+      );
+      _currentSongProvider._setInitSong(nextSong, index: nextIndex);
+      break;
+    case LoopModeSetting.single:
+      nextSong = _musics[currentIndex];
+      await _players.open(
+        Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+        showNotification: true,
+        notificationSettings: sharedParameter.notificationSettings(
+          _globalContext!,
+          musics: _musics,
+        ),
+      );
+
+      _currentSongProvider._setInitSong(nextSong, index: currentIndex);
+      break;
+    case LoopModeSetting.none:
+      nextSong = MusicModel();
+      await _players.stop();
+      _currentSongProvider.stopSong();
+      break;
+    default:
+  }
+
+  ///* Save History Recents Play
+  _recentPlayProvider.add(nextSong);
+
+  return nextSong;
+});

@@ -18,7 +18,7 @@ class MusicPlayerActionMore extends StatelessWidget {
           case ConstString.syncPMB:
             context.read(isLoading).state = true;
             context
-                .refresh(futureShowListMusic)
+                .refresh(futureShowListMusic(true))
                 .whenComplete(() => context.read(isLoading).state = false);
             break;
 

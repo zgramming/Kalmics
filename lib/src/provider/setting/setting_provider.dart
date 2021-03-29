@@ -12,6 +12,7 @@ class SettingProvider extends StateNotifier<SettingModel> {
 
   static const _isPassedOnboardingKey = '_isPassedOnboardingKey';
   static const _isShuffleKey = '_isShuffleKey';
+  static const _isFirstLoad = '_isFirstLoad';
   static const _loopModeKey = '_loopModeKey';
   static const _sortByTypeKey = '_sortByTypeKey';
   static const _sortChoice = '_sortChoice';
@@ -91,6 +92,12 @@ class SettingProvider extends StateNotifier<SettingModel> {
     state = state.copyWith(timerDuration: duration);
   }
 
+  Future<void> setFirstLoad({required bool value}) async {
+    final box = Hive.box(boxSettingKey);
+    box.put(_isFirstLoad, value);
+    state = state.copyWith(isFirstLoad: value);
+  }
+
   Future<void> readSettingProvider() async {
     final box = Hive.box(boxSettingKey);
 
@@ -102,6 +109,7 @@ class SettingProvider extends StateNotifier<SettingModel> {
         box.get(_sortChoice, defaultValue: ConstString.sortChoiceByTitle) as String;
     final sessionShuffle = box.get(_isShuffleKey, defaultValue: ConstString.notUseShuffle) as bool;
     final sessionLoopMode = box.get(_loopModeKey, defaultValue: ConstString.loopModeAll) as String;
+    final sessionFirstLoad = box.get(_isFirstLoad, defaultValue: ConstString.isFirstLoad) as bool;
 
     var loopMode = LoopModeSetting.all;
     switch (sessionLoopMode) {
@@ -126,46 +134,49 @@ class SettingProvider extends StateNotifier<SettingModel> {
       sortChoice: sessionSortChoice,
       isShuffle: sessionShuffle,
       loopMode: loopMode,
+      isFirstLoad: sessionFirstLoad,
     );
   }
 }
 
 final settingProvider = StateNotifierProvider((ref) => SettingProvider());
 
-final iconLoopMode = StateProvider.family<Widget, BuildContext>((ref, context) {
-  final _settingProvider = ref.watch(settingProvider.state);
+final iconLoopMode = StateProvider.family<Widget, BuildContext>(
+  (ref, context) {
+    final _settingProvider = ref.watch(settingProvider.state);
 
-  IconData icon = Icons.loop;
+    IconData icon = Icons.loop;
 
-  switch (_settingProvider.loopMode) {
-    case LoopModeSetting.none:
-      icon = Icons.repeat;
-      break;
-    case LoopModeSetting.single:
-      icon = Icons.repeat_one_rounded;
-      break;
-    case LoopModeSetting.all:
-      icon = Icons.repeat;
-      break;
-    default:
-      icon = Icons.repeat_one_rounded;
-      break;
-  }
-  final color = _settingProvider.loopMode == LoopModeSetting.all
-      ? colorPallete.accentColor!
-      : Colors.transparent;
-  return CircleAvatar(
-    backgroundColor: color,
-    foregroundColor: Colors.white,
-    radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
-    child: FittedBox(
-      child: Icon(
-        icon,
-        size: ConstSize.iconActionMusicPlayerDetail(context),
+    switch (_settingProvider.loopMode) {
+      case LoopModeSetting.none:
+        icon = Icons.repeat;
+        break;
+      case LoopModeSetting.single:
+        icon = Icons.repeat_one_rounded;
+        break;
+      case LoopModeSetting.all:
+        icon = Icons.repeat;
+        break;
+      default:
+        icon = Icons.repeat_one_rounded;
+        break;
+    }
+    final color = _settingProvider.loopMode == LoopModeSetting.all
+        ? colorPallete.accentColor!
+        : Colors.transparent;
+    return CircleAvatar(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
+      child: FittedBox(
+        child: Icon(
+          icon,
+          size: ConstSize.iconActionMusicPlayerDetail(context),
+        ),
       ),
-    ),
-  );
-});
+    );
+  },
+);
 
 final styleAscDescButton = StateProvider.family<ButtonStyle, int>((ref, value) {
   final _settingProvider = ref.watch(settingProvider.state);

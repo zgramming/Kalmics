@@ -1,16 +1,28 @@
 import 'dart:typed_data';
 
-import 'package:audiotagger/models/tag.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
 
-class MusicModel extends Equatable {
+import 'package:kalmics/src/network/my_network.dart';
+
+part 'music_model.g.dart';
+
+@HiveType(typeId: 1)
+class MusicModel extends HiveObject with EquatableMixin {
+  @HiveField(0)
   final String idMusic;
+  @HiveField(1)
   final String? title;
+  @HiveField(2)
   final String? pathFile;
-  final Tag? tag;
+  @HiveField(3)
+  final TagMetaDataModel? tag;
+  @HiveField(4)
   final Uint8List? artwork;
+  @HiveField(5)
   final Duration? songDuration;
-  const MusicModel({
+
+  MusicModel({
     this.idMusic = '',
     this.title,
     this.pathFile,
@@ -22,10 +34,10 @@ class MusicModel extends Equatable {
   List get props {
     return [
       idMusic,
-      tag,
       title,
-      artwork,
       pathFile,
+      tag,
+      artwork,
       songDuration,
     ];
   }
@@ -35,18 +47,18 @@ class MusicModel extends Equatable {
 
   MusicModel copyWith({
     String? idMusic,
-    Tag? tag,
     String? title,
-    Uint8List? artwork,
     String? pathFile,
+    TagMetaDataModel? tag,
+    Uint8List? artwork,
     Duration? songDuration,
   }) {
     return MusicModel(
       idMusic: idMusic ?? this.idMusic,
-      tag: tag ?? this.tag,
       title: title ?? this.title,
-      artwork: artwork ?? this.artwork,
       pathFile: pathFile ?? this.pathFile,
+      tag: tag ?? this.tag,
+      artwork: artwork ?? this.artwork,
       songDuration: songDuration ?? this.songDuration,
     );
   }

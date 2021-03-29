@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,41 +24,31 @@ class SharedParameter {
     BuildContext context, {
     required List<MusicModel> musics,
   }) {
+    final BuildContext _globalContext = context.read(globalContext).state!;
     return NotificationSettings(
-      customPrevAction: (players) {
-        context.read(currentSongProvider).previousSong(
-              musics,
-              context: context,
-              players: players,
-            );
-      },
+      customPrevAction: (players) => context.refresh(previousSong),
       customPlayPauseAction: (player) {
-        player.playOrPause();
         player.playerState.listen((state) {
           switch (state) {
             case PlayerState.play:
-              context.read(currentSongProvider).resumeSong();
+              log('state play $state');
+              _globalContext.read(currentSongProvider).resumeSong();
               break;
             case PlayerState.pause:
-              context.read(currentSongProvider).pauseSong();
+              _globalContext.read(currentSongProvider).pauseSong();
               break;
             default:
-              context.read(currentSongProvider).stopSong();
+              _globalContext.read(currentSongProvider).stopSong();
               break;
           }
         });
+        player.playOrPause();
       },
-      customNextAction: (player) {
-        final currentLoop = context.read(settingProvider.state).loopMode;
-        context.read(currentSongProvider).nextSong(
-              musics,
-              loopModeSetting: currentLoop,
-              context: context,
-              players: player,
-            );
-      },
-      customStopAction: (player) {
-        context.read(currentSongProvider).stopSong();
+      customNextAction: (player) => context.refresh(nextSong),
+      customStopAction: (player) async {
+        log('Detail Player : ${await player.audioSessionId.first}\n${(await player.current.first)!.audio.audio.metas}');
+        log('state stop');
+        _globalContext.read(currentSongProvider).stopSong();
         player.stop();
       },
     );

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/config/my_config.dart';
 
+import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
 import '../../shared/my_shared.dart';
+
 import '../home/home_screen.dart';
 import '../music_player/music_player_screen.dart';
+import '../setting/setting_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const routeNamed = '/welcome-screen';
@@ -33,8 +34,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      SharedFunction.initAudioPlayers(context, timer: timer);
+      context.read(globalContext).state = context;
+      context.refresh(initListMusic);
       SharedFunction.initWatcher(context);
+      SharedFunction.initAudioPlayers(context, timer: timer);
     });
 
     super.initState();
@@ -44,6 +47,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void dispose() {
     context.read(globalTimer).state?.cancel();
     context.read(globalAudioPlayers).state.dispose();
+
     super.dispose();
   }
 
@@ -57,29 +61,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                ...ConstColor.backgroundColorGradient(),
-              ],
+              colors: ConstColor.backgroundColorGradient(),
             ),
           ),
-          child: Consumer(
-            builder: (context, watch, child) {
-              final futureListMusic = watch(futureShowListMusic);
-              return futureListMusic.when(
-                data: (_) => IndexedStack(index: _selectedIndex, children: screens),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) => Center(
-                  child: Text(
-                    error.toString(),
-                    style: GoogleFonts.montserrat(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          child: IndexedStack(index: _selectedIndex, children: screens),
         ),
         floatingActionButton: InkWell(
           onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),
@@ -115,15 +100,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class SettingScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Setting Screen'),
     );
   }
 }

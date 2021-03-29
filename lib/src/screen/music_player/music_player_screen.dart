@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -17,14 +19,16 @@ class MusicPlayerScreen extends StatefulWidget {
   _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
 }
 
-class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
+class _MusicPlayerScreenState extends State<MusicPlayerScreen> with AutomaticKeepAliveClientMixin {
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    log('dispose on MusicPlayerScreen');
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: ProviderListener<StateController<bool>>(
         provider: isLoading,
@@ -45,9 +49,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  ...ConstColor.backgroundColorGradient(),
-                ],
+                colors: ConstColor.backgroundColorGradient(),
               ),
             ),
             child: Stack(
@@ -58,6 +60,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 Consumer(
                   builder: (context, watch, child) {
                     final isSearch = watch(globalSearch).state;
+
                     if (isSearch) {
                       return SizedBox.expand(
                         child: Container(
@@ -75,4 +78,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

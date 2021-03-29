@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -10,15 +8,15 @@ import '../../../network/my_network.dart';
 import '../../../provider/my_provider.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
 
-class MusicPlayerItem extends ConsumerWidget {
+class MusicPlayerItem extends StatelessWidget {
   final List<MusicModel> musics;
 
-  MusicPlayerItem({
+  const MusicPlayerItem({
     required this.musics,
   });
-  final sharedParameter = SharedParameter();
+
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
+  Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -36,22 +34,14 @@ class MusicPlayerItem extends ConsumerWidget {
           children: [
             ListTile(
               onTap: () async {
-                final players = context.read(globalAudioPlayers).state;
-                context.read(currentSongProvider).playSong(
-                      result,
-                      context: context,
-                      players: players,
-                      musics: musics,
-                      currentIndex: index,
-                    );
-
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (ctx) {
-                    return MusicPlayerDetailScreen();
-                  },
-                );
+                final map = {'music': result, 'index': index};
+                context.refresh(playSong(map)).then((_) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (ctx) => MusicPlayerDetailScreen(),
+                  );
+                });
               },
               leading: Container(
                 width: 60,
@@ -63,17 +53,24 @@ class MusicPlayerItem extends ConsumerWidget {
                   ),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Image.memory(
-                  artwork ?? base64.decode(''),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return ShowImageAsset(
-                        imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}');
-                  },
-                ),
+                child: artwork == null
+                    ? ShowImageAsset(
+                        imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                        fit: BoxFit.cover,
+                      )
+                    : Image.memory(
+                        artwork,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return ShowImageAsset(
+                            imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
               ),
               title: Text(
-                result.title!,
+                result.title ?? '',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.openSans(

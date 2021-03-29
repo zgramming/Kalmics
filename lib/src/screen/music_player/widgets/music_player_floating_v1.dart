@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -61,19 +59,24 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.memory(
-                          artwork ?? Uint8List.fromList([]),
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
+                        child: artwork == null
+                            ? Image.asset(
                                 '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
                                 fit: BoxFit.cover,
+                              )
+                            : Image.memory(
+                                artwork,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(
+                                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
                       ),
                     ),
                     Expanded(
@@ -85,7 +88,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              _currentSong.song.tag?.title ?? '',
+                              _currentSong.song.title ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.openSans(
@@ -111,7 +114,14 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: FloatingActionButton(
-                          onPressed: () => players.playOrPause(),
+                          onPressed: () {
+                            players.playOrPause();
+                            if (_currentSong.isPlaying) {
+                              context.read(currentSongProvider).pauseSong();
+                              return;
+                            }
+                            context.read(currentSongProvider).resumeSong();
+                          },
                           backgroundColor: Colors.transparent,
                           elevation: 0.0,
                           child: Icon(
