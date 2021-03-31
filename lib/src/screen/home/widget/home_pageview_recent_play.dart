@@ -18,27 +18,27 @@ class HomePageViewRecentPlayState extends State<HomePageViewRecentPlay>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          'Baru saja diputar',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 20),
-        SizedBox(
-          height: sizes.height(context) / 3,
-          child: Consumer(
-            builder: (context, watch, child) {
-              final _future = watch(initRecentPlayList);
-              final _recentsList = watch(recentsPlayList).state;
-              return _future.when(
-                data: (value) {
-                  if (_recentsList.isEmpty) {
-                    return Center(
-                      child: Text(
+    return SizedBox(
+      height: sizes.height(context) / 2.5,
+      child: Consumer(
+        builder: (context, watch, child) {
+          final _future = watch(initRecentPlayList);
+          final _recentsList = watch(recentsPlayList).state;
+          return _future.when(
+            data: (value) {
+              if (_recentsList.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Image.asset(
+                          '${appConfig.urlImageAsset}/gummy-ipod.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
                         'Dengarkan lagu pertamamu !',
                         style: GoogleFonts.openSans(
                           fontWeight: FontWeight.bold,
@@ -46,23 +46,23 @@ class HomePageViewRecentPlayState extends State<HomePageViewRecentPlay>
                           color: Colors.white,
                         ),
                       ),
-                    );
-                  }
-                  return HomePageViewRecentPlayItem(recentsPlay: _recentsList);
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                error: (error, stackTrace) => Center(
-                  child: Text(
-                    error.toString(),
+                    ],
                   ),
-                ),
-              );
+                );
+              }
+              return HomePageViewRecentPlayItem(recentsPlay: _recentsList);
             },
-          ),
-        ),
-      ],
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            error: (error, stackTrace) => Center(
+              child: Text(
+                error.toString(),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

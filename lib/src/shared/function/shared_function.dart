@@ -10,6 +10,7 @@ import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kalmics/src/network/model/music/music_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:watcher/watcher.dart';
 
 import '../../config/my_config.dart';
@@ -179,6 +180,38 @@ class SharedFunction {
         context.refresh(editArtworkSong(music));
       }
       Navigator.of(context).pop();
+    } catch (e) {
+      GlobalFunction.showSnackBar(
+        context,
+        content: Text(e.toString()),
+        snackBarType: SnackBarType.error,
+      );
+    }
+  }
+
+  static Future<void> openUrl(
+    String url, {
+    required BuildContext context,
+    bool isEmail = false,
+  }) async {
+    try {
+      if (isEmail) {
+        final uri = Uri(
+          scheme: 'mailto',
+          path: url,
+          queryParameters: {
+            'subject': ConstString.subjectEmail,
+            'body': ConstString.bodyEmail,
+          },
+        );
+        launch(uri.toString());
+        return;
+      }
+      if (await canLaunch(url)) {
+        await launch(url, universalLinksOnly: true);
+      } else {
+        throw 'There was a problem to open the url: $url';
+      }
     } catch (e) {
       GlobalFunction.showSnackBar(
         context,

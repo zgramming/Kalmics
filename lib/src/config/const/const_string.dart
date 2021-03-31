@@ -48,11 +48,16 @@ class ConstString {
   ///* Word [Give Rating]
   static const giveRating = 'Berikan Rating';
 
+  ///* Word [Copyright Icon Permission]
+  static const copyrightPermission = 'Copyright Icon';
+
   static const urlFacebook = 'https://www.facebook.com/zeffry.reynando/';
   static const urlGithub = 'https://github.com/zgramming';
   static const urlGmail = 'zeffry.reynando@gmail.com';
   static const urlLinkedIn = 'https://www.linkedin.com/in/zeffry-reynando/';
   static const urlInstagram = 'https://www.instagram.com/zeffry_reynando/';
+  static const urlIcons8 = 'https://icons8.com';
+
   static const subjectEmail = 'Kalmics App';
   static const bodyEmail = 'Hello Zeffry Reynando !';
 }

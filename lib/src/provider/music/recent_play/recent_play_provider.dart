@@ -1,8 +1,4 @@
-import 'dart:collection';
-import 'dart:developer';
-
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:hive/hive.dart';
@@ -170,7 +166,9 @@ final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
   }
 
   if (tempMap.length < 5) {
-    for (final item in tempMap.entries) {
+    final tempEntries = tempMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final map = Map.fromEntries(tempEntries);
+    for (final item in map.entries) {
       final music =
           _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());
       if (music.idMusic.isNotEmpty) {
@@ -185,7 +183,6 @@ final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
 
   final result = Map.fromEntries(take5);
 
-  tempMap.clear();
   for (final item in result.entries) {
     final music =
         _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());

@@ -1,16 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kalmics/src/network/my_network.dart';
 
 import '../../provider/my_provider.dart';
 
 import './widget/home_pageview_recent_play.dart';
 import 'widget/home_floating_player.dart';
 import 'widget/home_line_chart.dart';
-import 'widget/home_most_playing_song.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -36,10 +34,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 children: [
                   HomeLineChart(),
                   const SizedBox(height: 20),
-                  HomeTopPlaylist(),
+                  const HomeTopPlaylist(),
                   Divider(color: Colors.white.withOpacity(.5)),
-                  // const SizedBox(height: 20),
-                  // const HomeMostPlayingSong(),
                   const SizedBox(height: 20),
                   HomePageViewRecentPlay(),
                   const SizedBox(height: 20),
@@ -71,27 +67,24 @@ class HomeTopPlaylist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'PALING BANYAK DIDENGAR',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
-        ),
-        Consumer(
-          builder: (_, watch, __) {
-            final _future = watch(initRecentPlayList);
-            return _future.when(
-              data: (_) {
-                final top5Chart = watch(recentsPlay5TopChart).state;
-                if (top5Chart.isEmpty) {
-                  return const SizedBox();
-                }
-                final mostPlayingNumber = watch(recentsPlayMostPlayingSong).state['total'] as int;
-                return ListView.builder(
+    return Consumer(
+      builder: (_, watch, __) {
+        final _future = watch(initRecentPlayList);
+        return _future.when(
+          data: (_) {
+            final top5Chart = watch(recentsPlay5TopChart).state;
+            if (top5Chart.isEmpty) {
+              return const SizedBox();
+            }
+            return Column(
+              children: [
+                Text(
+                  'PALING BANYAK DIDENGAR',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                ),
+                ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: top5Chart.length,
@@ -133,8 +126,8 @@ class HomeTopPlaylist extends StatelessWidget {
                               builder: (context, constraints) {
                                 final maxWidth = constraints.maxWidth;
                                 final _increasePercentace = increasePercentace(
-                                    maxWidth: maxWidth,
-                                    mostPlayedSong: mostPlayingNumber,
+                                    map: top5Chart,
+                                    maxWidthLayoutBuilder: maxWidth,
                                     totalSongPlayedItem: top5Chart.values.elementAt(index));
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -199,25 +192,27 @@ class HomeTopPlaylist extends StatelessWidget {
                       ),
                     );
                   },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(
-                child: Text(error.toString()),
-              ),
+                ),
+              ],
             );
           },
-        )
-      ],
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(
+            child: Text(error.toString()),
+          ),
+        );
+      },
     );
   }
 
   double increasePercentace({
-    required double maxWidth,
-    required int mostPlayedSong,
+    required Map<MusicModel, int> map,
+    required double maxWidthLayoutBuilder,
     required int totalSongPlayedItem,
   }) {
-    final result = maxWidth * ((mostPlayedSong - totalSongPlayedItem) / mostPlayedSong);
+    final mostPlayedSong = map.values.reduce((curr, next) => curr > next ? curr : next);
+    final result =
+        maxWidthLayoutBuilder * ((mostPlayedSong - totalSongPlayedItem) / mostPlayedSong);
     return result;
   }
 }

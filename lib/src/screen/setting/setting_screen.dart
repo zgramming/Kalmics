@@ -1,45 +1,14 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/my_config.dart';
+import '../../shared/my_shared.dart';
 
 class SettingScreen extends StatelessWidget {
-  Future<void> openUrl(
-    String url, {
-    required BuildContext context,
-    bool isEmail = false,
-  }) async {
-    try {
-      if (isEmail) {
-        final uri = Uri(
-          scheme: 'mailto',
-          path: url,
-          queryParameters: {
-            'subject': ConstString.subjectEmail,
-            'body': ConstString.bodyEmail,
-          },
-        );
-        launch(uri.toString());
-        return;
-      }
-      if (await canLaunch(url)) {
-        await launch(url, universalLinksOnly: true);
-      } else {
-        throw 'There was a problem to open the url: $url';
-      }
-    } catch (e) {
-      GlobalFunction.showSnackBar(
-        context,
-        content: Text(e.toString()),
-        snackBarType: SnackBarType.error,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -95,6 +64,24 @@ class SettingScreen extends StatelessWidget {
                           Divider(
                             color: Colors.white.withOpacity(.5),
                           ),
+                          ListTile(
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.copyright_rounded),
+                            ),
+                            title: Text(
+                              ConstString.copyrightPermission,
+                              style: GoogleFonts.openSans(
+                                color: Colors.white,
+                              ),
+                            ),
+                            onTap: () async {
+                              showDialog(
+                                  context: context, builder: (ctx) => SettingDialogIconCopyright());
+                            },
+                          ),
+                          Divider(
+                            color: Colors.white.withOpacity(.5),
+                          ),
                         ],
                       ),
                     ),
@@ -108,19 +95,20 @@ class SettingScreen extends StatelessWidget {
                       icon: FontAwesomeIcons.facebookF,
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
-                      onTap: () => openUrl(ConstString.urlFacebook, context: context),
+                      onTap: () =>
+                          SharedFunction.openUrl(ConstString.urlFacebook, context: context),
                     ),
                     ActionCircleButton(
                       icon: FontAwesomeIcons.github,
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
-                      onTap: () => openUrl(ConstString.urlGithub, context: context),
+                      onTap: () => SharedFunction.openUrl(ConstString.urlGithub, context: context),
                     ),
                     ActionCircleButton(
                       icon: FontAwesomeIcons.envelope,
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      onTap: () => openUrl(
+                      onTap: () => SharedFunction.openUrl(
                         ConstString.urlGmail,
                         context: context,
                         isEmail: true,
@@ -130,13 +118,15 @@ class SettingScreen extends StatelessWidget {
                       icon: FontAwesomeIcons.linkedinIn,
                       backgroundColor: Colors.lightBlue,
                       foregroundColor: Colors.white,
-                      onTap: () => openUrl(ConstString.urlLinkedIn, context: context),
+                      onTap: () =>
+                          SharedFunction.openUrl(ConstString.urlLinkedIn, context: context),
                     ),
                     ActionCircleButton(
                       icon: FontAwesomeIcons.instagram,
                       backgroundColor: Colors.pink,
                       foregroundColor: Colors.white,
-                      onTap: () => openUrl(ConstString.urlInstagram, context: context),
+                      onTap: () =>
+                          SharedFunction.openUrl(ConstString.urlInstagram, context: context),
                     ),
                   ],
                 ),
@@ -146,6 +136,52 @@ class SettingScreen extends StatelessWidget {
           ),
           const SizedBox(height: kToolbarHeight)
         ],
+      ),
+    );
+  }
+}
+
+class SettingDialogIconCopyright extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: SizedBox(
+        height: sizes.height(context) / 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Image.asset(
+                '${appConfig.urlImageAsset}/icons8.png',
+              ),
+            ),
+            Expanded(
+              child: Align(
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Icons made by ',
+                    style: const TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: 'Icons8 ',
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () async {
+                            await SharedFunction.openUrl(
+                              ConstString.urlIcons8,
+                              context: context,
+                            );
+                          },
+                        style: GoogleFonts.openSans().copyWith(color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.openSans(color: Colors.black),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
