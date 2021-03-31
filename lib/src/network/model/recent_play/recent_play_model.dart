@@ -12,18 +12,16 @@ class RecentPlayModel extends HiveObject with EquatableMixin {
   final MusicModel music;
   @HiveField(2)
   final DateTime? createDate;
-  @HiveField(3)
-  final Duration? totalListenSong;
+
   RecentPlayModel({
     this.id = '',
     required this.music,
     this.createDate,
-    this.totalListenSong,
   });
 
   @override
   // TODO: implement props
-  List get props => [id, music, createDate, totalListenSong];
+  List get props => [id, music, createDate];
 
   @override
   bool get stringify => true;
@@ -38,7 +36,6 @@ class RecentPlayModel extends HiveObject with EquatableMixin {
       id: id ?? this.id,
       music: music ?? this.music,
       createDate: createDate ?? this.createDate,
-      totalListenSong: totalListenSong ?? this.totalListenSong,
     );
   }
 }

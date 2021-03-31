@@ -7,6 +7,7 @@ import 'package:share/share.dart';
 
 import '../../../provider/my_provider.dart';
 import './music_player_detail_screenshot.dart';
+import 'music_player_detail_info_total_playing.dart';
 
 class MusicPlayerDetailTitle extends StatefulWidget {
   @override
@@ -55,12 +56,10 @@ class _MusicPlayerDetailTitleState extends State<MusicPlayerDetailTitle> {
                     alignment: WrapAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () async {
-                          await Share.shareFiles(
-                            [_currentSong.song.pathFile ?? ''],
-                            text: _currentSong.song.title,
-                          );
-                        },
+                        onTap: () async => Share.shareFiles(
+                          [_currentSong.song.pathFile ?? ''],
+                          text: _currentSong.song.title,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
@@ -73,27 +72,40 @@ class _MusicPlayerDetailTitleState extends State<MusicPlayerDetailTitle> {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: colorPallete.accentColor,
-                        ),
-                        child: const Icon(
-                          Icons.favorite,
-                          color: Colors.white,
+                      InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              shape:
+                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              child: MusicPlayerDetailInfoTotalPlaying(
+                                idMusic: _currentSong.song.idMusic,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: colorPallete.accentColor,
+                          ),
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
-                            builder: (context) => const MusicPlayerDetailScreenshot(),
-                          );
-                        },
+                        onTap: () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                          ),
+                          builder: (context) => const MusicPlayerDetailScreenshot(),
+                        ),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(

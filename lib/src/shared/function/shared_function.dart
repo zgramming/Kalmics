@@ -2,18 +2,18 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:kalmics/src/network/model/music/music_model.dart';
 import 'package:watcher/watcher.dart';
 
 import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
-import '../my_shared.dart';
 
 class SharedFunction {
   static void initWatcher(BuildContext context) {
@@ -32,7 +32,7 @@ class SharedFunction {
                 title: 'File Has Added',
                 body: '$basename Detect has added to application',
               )
-              .whenComplete(() => context.read(musicProvider).addMusic(file.path));
+              .whenComplete(() => context.refresh(addMusic(file.path)));
         }
 
         ///* Detect if file has remove on storage
@@ -44,7 +44,7 @@ class SharedFunction {
                 title: 'File Has Remove',
                 body: '$basename Detect has Remove from application',
               )
-              .then((_) => context.read(musicProvider).removeMusic(file.path));
+              .then((_) => context.refresh(removeMusic(file.path)));
         }
 
         ///* Detect if file has modify on storage
@@ -64,7 +64,6 @@ class SharedFunction {
     BuildContext context, {
     required Timer? timer,
   }) {
-    final sharedParameter = SharedParameter();
     // initialize [global_timer]
     context.read(globalTimer).state = timer;
 
@@ -74,12 +73,12 @@ class SharedFunction {
       final musics = context.read(musicProvider.state);
 
       if (musics.isNotEmpty) {
-        context.read(currentSongProvider).setDuration(currentDuration);
         final currentIndex = context.read(currentSongProvider.state).currentIndex;
         if (currentIndex >= 0) {
-          final totalDuration =
-              context.read(musicProvider.state)[currentIndex].songDuration?.inSeconds ?? 0;
-          // log('0.) currentDuration ${currentDuration.inSeconds} || Total Duration $totalDuration');
+          final music = context.read(musicProvider.state)[currentIndex];
+          final totalDuration = music.songDuration.inSeconds;
+
+          context.read(currentSongProvider).setDuration(currentDuration);
 
           /// Listen to current duration & total duration song
           /// If current duration exceeds the total song duration, Then Play Next Song
@@ -165,5 +164,27 @@ class SharedFunction {
     );
 
     return Future.value(true);
+  }
+
+  static Future<void> takeImage(
+    BuildContext context, {
+    required MusicModel music,
+    ImageSource source = ImageSource.gallery,
+  }) async {
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(source: source);
+      if (pickedImage != null) {
+        context.read(globalFileArtwork).state = File(pickedImage.path);
+        context.refresh(editArtworkSong(music));
+      }
+      Navigator.of(context).pop();
+    } catch (e) {
+      GlobalFunction.showSnackBar(
+        context,
+        content: Text(e.toString()),
+        snackBarType: SnackBarType.error,
+      );
+    }
   }
 }

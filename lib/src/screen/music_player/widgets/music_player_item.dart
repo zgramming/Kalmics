@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/shared/my_shared.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../config/my_config.dart';
 import '../../../network/my_network.dart';
 import '../../../provider/my_provider.dart';
+import '../../../shared/my_shared.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
+import './music_player_form_edit_song.dart';
 
 class MusicPlayerItem extends StatelessWidget {
   final List<MusicModel> musics;
@@ -25,8 +28,8 @@ class MusicPlayerItem extends StatelessWidget {
         final result = musics[index];
         final artis = result.tag?.artist;
         final artwork = result.artwork;
-        final durationInMinute = result.songDuration?.inMinutes;
-        final remainingSecond = (result.songDuration?.inSeconds ?? 0) % 60;
+        final durationInMinute = result.songDuration.inMinutes;
+        final remainingSecond = (result.songDuration.inSeconds) % 60;
         final _remainingSecond = (remainingSecond > 9) ? '$remainingSecond' : '0$remainingSecond';
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,31 +46,61 @@ class MusicPlayerItem extends StatelessWidget {
                   );
                 });
               },
-              leading: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
+              leading: InkWell(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  builder: (ctx) => Container(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Wrap(
+                      spacing: 20,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ActionCircleButton(
+                          icon: Icons.camera,
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          onTap: () => SharedFunction.takeImage(
+                            context,
+                            source: ImageSource.camera,
+                            music: result,
+                          ),
+                        ),
+                        ActionCircleButton(
+                          icon: Icons.image,
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          onTap: () => SharedFunction.takeImage(context, music: result),
+                        ),
+                      ],
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(5),
                 ),
-                child: artwork == null
-                    ? ShowImageAsset(
-                        imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
-                        fit: BoxFit.cover,
-                      )
-                    : Image.memory(
-                        artwork,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return ShowImageAsset(
-                            imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: artwork == null
+                      ? ShowImageAsset(
+                          imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                          fit: BoxFit.cover,
+                        )
+                      : Image.memory(
+                          artwork,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return ShowImageAsset(
+                              imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                ),
               ),
               title: Text(
                 result.title ?? '',
@@ -93,12 +126,39 @@ class MusicPlayerItem extends StatelessWidget {
               ),
               trailing: Wrap(
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.favorite_outline_rounded,
+                  PopupMenuButton(
+                    onSelected: (value) async {
+                      switch (value) {
+                        case ConstString.editSongPMB:
+                          showDialog(
+                            context: context,
+                            builder: (context) => FormEditSong(music: result),
+                          );
+                          break;
+                        default:
+                          GlobalFunction.showSnackBar(
+                            context,
+                            content: const Text('Pilihan tidak valid'),
+                            snackBarType: SnackBarType.error,
+                          );
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: ConstString.editSongPMB,
+                        child: Row(
+                          children: const [
+                            Icon(Icons.edit_outlined, color: Colors.black),
+                            SizedBox(width: 10),
+                            Text('Ubah'),
+                          ],
+                        ),
+                      ),
+                    ],
+                    child: const Icon(
+                      Icons.more_vert_rounded,
                       color: Colors.white,
                     ),
-                    onPressed: () {},
                   ),
                 ],
               ),

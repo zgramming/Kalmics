@@ -15,7 +15,7 @@ class MusicPlayerActionMore extends StatelessWidget {
     return PopupMenuButton(
       onSelected: (value) async {
         switch (value) {
-          case ConstString.syncPMB:
+          case ConstString.syncSongPMB:
             context.read(isLoading).state = true;
             context
                 .refresh(futureShowListMusic(true))
@@ -74,7 +74,7 @@ class MusicPlayerActionMore extends StatelessWidget {
 
             break;
 
-          case ConstString.sortPMB:
+          case ConstString.sortSongPMB:
             showModalBottomSheet(
               context: context,
               builder: (ctx) => const MusicPlayerActionMoreSorting(),
@@ -85,7 +85,7 @@ class MusicPlayerActionMore extends StatelessWidget {
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: ConstString.syncPMB,
+          value: ConstString.syncSongPMB,
           child: Row(
             children: const [
               Icon(Icons.sync_alt_rounded, color: Colors.black),
@@ -95,7 +95,7 @@ class MusicPlayerActionMore extends StatelessWidget {
           ),
         ),
         PopupMenuItem(
-          value: ConstString.sortPMB,
+          value: ConstString.sortSongPMB,
           child: Row(
             children: const [
               Icon(Icons.sort, color: Colors.black),

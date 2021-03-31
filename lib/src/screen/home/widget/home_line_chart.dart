@@ -46,10 +46,6 @@ class _HomeLineChartState extends State<HomeLineChart> {
                 child: Text(error.toString()),
               ),
             );
-            // final tes = watch(recentsPlayLineChart).state;
-            // _recentsPlayProvider.forEach((element) {
-            //   log('DateTime ${element.createDate?.weekday}');
-            // });
           }),
         ),
       ),
@@ -69,7 +65,7 @@ class _HomeLineChartState extends State<HomeLineChart> {
       axisTitleData: FlAxisTitleData(
         topTitle: AxisTitle(
           showTitle: true,
-          titleText: 'Statistik Pemutaran lagu Bulan $rangeDate',
+          titleText: 'Pemutaran lagu $rangeDate',
           margin: 20,
           textStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
@@ -111,17 +107,17 @@ class _HomeLineChartState extends State<HomeLineChart> {
             }
             return '';
           },
-          margin: 10,
+          margin: 20,
           getTextStyles: (value) => const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 11,
+            fontSize: 8,
           ),
           rotateAngle: 30,
         ),
         leftTitles: SideTitles(
           showTitles: true,
-          interval: 250,
+          interval: 200,
           getTextStyles: (value) => const TextStyle(
             color: Color(0xff67727d),
             fontWeight: FontWeight.bold,

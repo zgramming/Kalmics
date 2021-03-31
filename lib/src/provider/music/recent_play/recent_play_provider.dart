@@ -1,10 +1,13 @@
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:hive/hive.dart';
 import 'package:kalmics/src/network/my_network.dart';
+import 'package:kalmics/src/provider/music/music/music_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class RecentPlayProvider extends StateNotifier<List<RecentPlayModel>> {
@@ -116,6 +119,82 @@ final recentsPlayLineChart = StateProvider<List<FlSpot>>((ref) {
   }
 
   return tempListSpot;
+});
+
+final recentsTotalPlayingEachSong = StateProvider.family<int, String>((ref, idMusic) {
+  final _recentsPlay = ref.watch(recentPlayProvider.state);
+
+  ///* Save idMusic song as key
+  final tempMap = <String, int>{};
+
+  for (final recent in _recentsPlay) {
+    final original = tempMap[recent.music.idMusic];
+    if (original == null) {
+      tempMap[recent.music.idMusic] = 1;
+    } else {
+      final currentValue = tempMap[recent.music.idMusic] ?? 9999;
+      final result = currentValue + 1;
+      tempMap[recent.music.idMusic] = result;
+    }
+  }
+
+  if (tempMap.isEmpty) {
+    return 0;
+  }
+
+  final totalPlaying = tempMap.entries.firstWhere((element) => element.key == idMusic);
+  return totalPlaying.value;
+});
+
+final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
+  final _recentsPlay = ref.watch(recentPlayProvider.state);
+  final _musics = ref.watch(musicProvider.state);
+
+  ///* Save title song as key
+  final tempMap = <dynamic, int>{};
+  final tempMap2 = <MusicModel, int>{};
+
+  for (final recent in _recentsPlay) {
+    final original = tempMap[recent.music.idMusic];
+    if (original == null) {
+      tempMap[recent.music.idMusic] = 1;
+    } else {
+      final currentValue = tempMap[recent.music.idMusic] ?? 9999;
+      final result = currentValue + 1;
+      tempMap[recent.music.idMusic] = result;
+    }
+  }
+
+  if (tempMap.isEmpty) {
+    return {};
+  }
+
+  if (tempMap.length < 5) {
+    for (final item in tempMap.entries) {
+      final music =
+          _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());
+      if (music.idMusic.isNotEmpty) {
+        tempMap2[music] = item.value;
+      }
+    }
+    return tempMap2;
+  }
+
+  final tempEntries = tempMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  final take5 = Map.fromEntries(tempEntries).entries.take(5).toList();
+
+  final result = Map.fromEntries(take5);
+
+  tempMap.clear();
+  for (final item in result.entries) {
+    final music =
+        _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());
+    if (music.idMusic.isNotEmpty) {
+      tempMap2[music] = item.value;
+    }
+  }
+
+  return tempMap2;
 });
 
 final recentsPlayMostPlayingSong = StateProvider<Map<String, dynamic>>((ref) {

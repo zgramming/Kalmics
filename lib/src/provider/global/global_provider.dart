@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,4 +27,9 @@ final globalAudioPlayers = StateProvider<AssetsAudioPlayer>((ref) {
   return result;
 });
 
-final globalTimer = StateProvider<Timer?>((ref) {});
+/// Global Timer to stop song when timer end
+final globalTimer = StateProvider<Timer?>((ref) => null);
+
+/// Global file artwork, this usefull for update artwork
+/// When pick from storage / camera
+final globalFileArtwork = StateProvider<File?>((ref) => null);

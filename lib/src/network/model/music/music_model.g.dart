@@ -22,14 +22,15 @@ class MusicModelAdapter extends TypeAdapter<MusicModel> {
       pathFile: fields[2] as String?,
       tag: fields[3] as TagMetaDataModel?,
       artwork: fields[4] as Uint8List?,
-      songDuration: fields[5] as Duration?,
+      songDuration: fields[5] as Duration,
+      totalListenSong: fields[6] as Duration,
     );
   }
 
   @override
   void write(BinaryWriter writer, MusicModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.idMusic)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class MusicModelAdapter extends TypeAdapter<MusicModel> {
       ..writeByte(4)
       ..write(obj.artwork)
       ..writeByte(5)
-      ..write(obj.songDuration);
+      ..write(obj.songDuration)
+      ..writeByte(6)
+      ..write(obj.totalListenSong);
   }
 
   @override

@@ -20,7 +20,9 @@ class MusicModel extends HiveObject with EquatableMixin {
   @HiveField(4)
   final Uint8List? artwork;
   @HiveField(5)
-  final Duration? songDuration;
+  final Duration songDuration;
+  @HiveField(6)
+  final Duration totalListenSong;
 
   MusicModel({
     this.idMusic = '',
@@ -28,7 +30,8 @@ class MusicModel extends HiveObject with EquatableMixin {
     this.pathFile,
     this.tag,
     this.artwork,
-    this.songDuration,
+    this.songDuration = Duration.zero,
+    this.totalListenSong = Duration.zero,
   });
   @override
   List get props {
@@ -39,6 +42,7 @@ class MusicModel extends HiveObject with EquatableMixin {
       tag,
       artwork,
       songDuration,
+      totalListenSong,
     ];
   }
 
@@ -52,6 +56,7 @@ class MusicModel extends HiveObject with EquatableMixin {
     TagMetaDataModel? tag,
     Uint8List? artwork,
     Duration? songDuration,
+    Duration? totalListenSong,
   }) {
     return MusicModel(
       idMusic: idMusic ?? this.idMusic,
@@ -60,39 +65,7 @@ class MusicModel extends HiveObject with EquatableMixin {
       tag: tag ?? this.tag,
       artwork: artwork ?? this.artwork,
       songDuration: songDuration ?? this.songDuration,
-    );
-  }
-}
-
-class RecentMusicPlay extends Equatable {
-  final int id;
-  final int idMusic;
-  final DateTime? date;
-  final int totalPlay;
-  const RecentMusicPlay({
-    this.id = 1,
-    this.idMusic = 1,
-    this.date,
-    this.totalPlay = 0,
-  });
-
-  @override
-  List get props => [id, idMusic, date, totalPlay];
-
-  @override
-  bool get stringify => true;
-
-  RecentMusicPlay copyWith({
-    int? id,
-    int? idMusic,
-    DateTime? date,
-    int? totalPlay,
-  }) {
-    return RecentMusicPlay(
-      id: id ?? this.id,
-      idMusic: idMusic ?? this.idMusic,
-      date: date ?? this.date,
-      totalPlay: totalPlay ?? this.totalPlay,
+      totalListenSong: totalListenSong ?? this.totalListenSong,
     );
   }
 }

@@ -77,16 +77,6 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
       itemBuilder: (_, index) {
         final result = widget.recentsPlay[index];
 
-        var margin = EdgeInsets.zero;
-        if (index != _currentIndexPageView) {
-          if (index == _previousIndexPageView) {
-            margin = const EdgeInsets.only(left: 24);
-          }
-          if (index == _nextIndexPageView) {
-            margin = const EdgeInsets.only(right: 24);
-          }
-        }
-
         return AnimatedBuilder(
           animation: animationController,
           builder: (_, child) {
@@ -99,15 +89,17 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
           },
           child: Stack(
             fit: StackFit.expand,
+            clipBehavior: Clip.none,
             children: [
               Container(
-                margin: margin,
+                // margin: margin,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: .5,
-                  ),
                   borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white,
+                    ),
+                  ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15.0),
@@ -135,22 +127,21 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
                   left: 0,
                   right: 0,
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(15)),
                       color: colorPallete.accentColor,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: .2,
-                      ),
                     ),
                     child: Text(
                       result.music.title ?? 'Unknown Title',
                       maxLines: 2,
+                      textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.openSans(
                         color: Colors.white,
-                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 8,
                       ),
                     ),
                   ),

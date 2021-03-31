@@ -20,22 +20,19 @@ class RecentPlayModelAdapter extends TypeAdapter<RecentPlayModel> {
       id: fields[0] as String,
       music: fields[1] as MusicModel,
       createDate: fields[2] as DateTime?,
-      totalListenSong: fields[3] as Duration?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RecentPlayModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.music)
       ..writeByte(2)
-      ..write(obj.createDate)
-      ..writeByte(3)
-      ..write(obj.totalListenSong);
+      ..write(obj.createDate);
   }
 
   @override

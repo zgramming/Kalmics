@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kalmics/src/network/my_network.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:kalmics/src/provider/global/global_provider.dart';
-import 'package:kalmics/src/provider/music/music/music_provider.dart';
-import 'package:kalmics/src/provider/music/recent_play/recent_play_provider.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
-import 'package:kalmics/src/shared/my_shared.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../network/my_network.dart';
+import '../../../shared/my_shared.dart';
+import '../../my_provider.dart';
 
 class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
   CurrentSongProvider([CurrentSongModel? state])
@@ -63,6 +60,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     _setPlaying(isPlaying);
     _setFloating(isFloating);
     _setCurrentIndex(index ?? state.currentIndex);
+    setDuration(Duration.zero);
   }
 }
 
@@ -107,6 +105,10 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 
   final lastIndex = _musics.length - 1;
   final currentIndex = _currentSong.currentIndex;
+
+  ///* Save Listen Song Duration Every Song
+  ref.read(setListenSong(_currentSong.song));
+
   var nextIndex = 0;
   if (_musics.length > 1) {
     /// Check if current index - 1 is Negative
@@ -149,6 +151,10 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 
   final lastIndex = _musics.length - 1;
   final currentIndex = _currentSong.currentIndex;
+
+  ///* Save Listen Song Duration Every Song
+  ref.read(setListenSong(_currentSong.song));
+
   var nextIndex = 0;
   if (_musics.length > 1) {
     /// Check if current index + 1 exceeds the last index
@@ -169,6 +175,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
           musics: _musics,
         ),
       );
+
       _currentSongProvider._setInitSong(nextSong, index: nextIndex);
       break;
     case LoopModeSetting.single:

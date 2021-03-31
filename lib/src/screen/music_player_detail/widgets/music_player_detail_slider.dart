@@ -47,7 +47,7 @@ class MusicPlayerDetailSlider extends StatelessWidget {
                 final _currentSong = watch(currentSongProvider.state);
                 return Slider.adaptive(
                   value: _currentSong.currentDuration.inSeconds.toDouble(),
-                  max: _currentSong.song.songDuration?.inSeconds.toDouble() ?? 0.0,
+                  max: _currentSong.song.songDuration.inSeconds.toDouble(),
                   onChangeStart: (value) async {
                     final newDuration = Duration(seconds: value.toInt());
                     await players.seek(newDuration);

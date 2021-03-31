@@ -4,22 +4,17 @@ import 'package:kalmics/src/config/my_config.dart';
 import 'package:kalmics/src/provider/my_provider.dart';
 import 'package:kalmics/src/shared/my_shared.dart';
 
-class MusicPlayerDetailActionNext extends ConsumerWidget {
+class MusicPlayerDetailActionNext extends StatelessWidget {
   final SharedParameter sharedParameter = SharedParameter();
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final players = watch(globalAudioPlayers).state;
-    final _musics = watch(musicProvider.state);
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         final _globalAnimation = context.read(globalSizeAnimationController).state;
         _globalAnimation?.reset();
         Future.delayed(const Duration(milliseconds: 200), () {
           context.refresh(nextSong);
-
-          ///* Add History Recent Play
-          // context.read(recentPlayProvider).add(result);
           _globalAnimation?.forward();
         });
       },

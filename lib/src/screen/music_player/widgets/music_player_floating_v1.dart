@@ -20,15 +20,18 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
       left: 10,
       child: Consumer(
         builder: (context, watch, child) {
-          final players = context.read(globalAudioPlayers).state;
-
           final _currentSong = watch(currentSongProvider.state);
           final _currentSongIsPlaying = _currentSong.isPlaying;
           final _currentSongIsFloating = _currentSong.isFloating;
 
-          final artwork = _currentSong.song.artwork;
-          final artist = _currentSong.song.tag?.artist ?? '';
-          final album = _currentSong.song.tag?.album ?? '';
+          if (_currentSong.song.idMusic.isEmpty) {
+            return const SizedBox();
+          }
+          final _music = watch(musicById(_currentSong.song.idMusic)).state;
+          final title = _music.title ?? '';
+          final artwork = _music.artwork;
+          final artist = _music.tag?.artist ?? '';
+          final album = _music.tag?.album ?? '';
           return Visibility(
             visible: _currentSongIsFloating,
             child: InkWell(
@@ -88,7 +91,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              _currentSong.song.title ?? '',
+                              title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.openSans(
@@ -115,7 +118,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                       child: Center(
                         child: FloatingActionButton(
                           onPressed: () {
-                            players.playOrPause();
+                            context.read(globalAudioPlayers).state.playOrPause();
                             if (_currentSong.isPlaying) {
                               context.read(currentSongProvider).pauseSong();
                               return;

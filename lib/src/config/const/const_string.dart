@@ -11,9 +11,10 @@ class ConstString {
   static const String sortChoiceByDuration = 'duration';
 
   ///* PopuMenuButton Value
-  static const String syncPMB = 'sync';
-  static const String sortPMB = 'sort';
+  static const String syncSongPMB = 'sync';
+  static const String sortSongPMB = 'sort';
   static const String timerPMB = 'timer';
+  static const String editSongPMB = 'edit';
 
   ///* LoopMode Value
   static const String loopModeAll = 'all';
