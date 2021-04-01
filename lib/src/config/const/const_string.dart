@@ -60,4 +60,6 @@ class ConstString {
 
   static const subjectEmail = 'Kalmics App';
   static const bodyEmail = 'Hello Zeffry Reynando !';
+
+  static const lastSongPlayed = 'LAGU TERAKHIR DIPUTAR';
 }

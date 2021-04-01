@@ -54,7 +54,7 @@ class OnboardingScreen extends StatelessWidget {
               return;
             }
             context.read(isLoading).state = true;
-            context.refresh(futureShowListMusic(true)).then((_) async {
+            context.refresh(futureShowListMusic).then((_) async {
               context.read(isLoading).state = false;
               await context
                   .read(settingProvider)

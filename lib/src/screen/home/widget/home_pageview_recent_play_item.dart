@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/network/my_network.dart';
+
+import '../../../config/my_config.dart';
+import '../../../network/my_network.dart';
 
 class HomePageViewRecentPlayItem extends StatefulWidget {
   final List<RecentPlayModel> recentsPlay;
@@ -59,7 +61,7 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
     return Column(
       children: [
         Text(
-          'LAGU TERAKHIR DIPUTAR',
+          ConstString.lastSongPlayed,
           textAlign: TextAlign.center,
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,

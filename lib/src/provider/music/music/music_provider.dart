@@ -22,22 +22,21 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
     state = [...musics];
   }
 
-  void _addListMusic(
-    List<MusicModel> musics, {
-    bool withSync = true,
-  }) {
+  Future<void> _addListMusic(List<MusicModel> musics) async {
     final musicBox = Hive.box<MusicModel>(musicBoxKey);
-    if (withSync) {
-      for (final MusicModel music in musics) {
-        final isExists = musicBox.values.firstWhere(
-          (element) =>
-              (element.pathFile ?? '').toLowerCase().contains((music.pathFile ?? '').toLowerCase()),
-          orElse: () => MusicModel(),
-        );
 
-        if (isExists.tag?.title == null) {
-          musicBox.put(music.idMusic, music);
-        }
+    /// Always truncate music database if sync is fired
+    await musicBox.deleteAll(musicBox.keys);
+
+    for (final MusicModel music in musics) {
+      final isExists = musicBox.values.firstWhere(
+        (element) =>
+            (element.pathFile ?? '').toLowerCase().contains((music.pathFile ?? '').toLowerCase()),
+        orElse: () => MusicModel(),
+      );
+
+      if (isExists.tag?.title == null) {
+        musicBox.put(music.idMusic, music);
       }
     }
     final listMusic = musicBox.values.toList()
@@ -51,14 +50,14 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
       ..sort((a, b) => (a.title ?? '').toLowerCase().compareTo((b.title ?? '').toLowerCase()));
   }
 
-  void _editSong(String idMusic, TagMetaDataModel tag) {
+  void _editMusic(String idMusic, TagMetaDataModel tag) {
     state = [
       for (var item in state)
         if (item.idMusic == idMusic) item.copyWith(tag: tag, title: tag.title) else item
     ];
   }
 
-  void _editArtworkSong(String idMusic, Uint8List artwork) {
+  void _editArtworkMusic(String idMusic, Uint8List artwork) {
     state = [
       for (var item in state)
         if (item.idMusic == idMusic) item.copyWith(artwork: artwork) else item
@@ -217,7 +216,11 @@ final initListMusic = FutureProvider<bool>((ref) async {
 final removeMusic = FutureProvider.family<void, String>((ref, path) async {
   final musics = ref.read(musicProvider.state);
   final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
-  final music = musics.firstWhere((element) => element.pathFile == path);
+  final music =
+      musics.firstWhere((element) => element.pathFile == path, orElse: () => MusicModel());
+  if (music.idMusic.isEmpty) {
+    throw Exception('Failed to remove song from application');
+  }
   musicBox.delete(music.idMusic).then((_) => ref.read(musicProvider)._removeMusic(path));
   log('Trigger Remove Background Music');
 });
@@ -321,7 +324,7 @@ final editSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
 
     final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
     await musicBox.put(music.idMusic, music.copyWith(tag: tagMetaData));
-    ref.read(musicProvider)._editSong(music.idMusic, tagMetaData);
+    ref.read(musicProvider)._editMusic(music.idMusic, tagMetaData);
   }
 });
 
@@ -340,15 +343,14 @@ final editArtworkSong = FutureProvider.family<void, MusicModel>((ref, music) asy
     }
     final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
     await musicBox.put(music.idMusic, music.copyWith(artwork: artwork));
-    ref.read(musicProvider)._editArtworkSong(music.idMusic, artwork);
+    ref.read(musicProvider)._editArtworkMusic(music.idMusic, artwork);
   }
 });
 
-final futureShowListMusic = FutureProvider.family.autoDispose<void, bool>((ref, withSync) async {
+final futureShowListMusic = FutureProvider.autoDispose<void>((ref) async {
   final _musicProvider = ref.watch(musicProvider);
   final players = AssetsAudioPlayer.withId(ConstString.idAssetAudioPlayer);
   final tagger = Audiotagger();
-  final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
 
   /// Folder to find music for platform [android], Not yet support for IOS
   Directory dir = Directory('');
@@ -372,6 +374,8 @@ final futureShowListMusic = FutureProvider.family.autoDispose<void, bool>((ref, 
       const uuid = Uuid();
 
       final path = file.path;
+      await players.open(Audio.file(path), autoStart: false);
+      final songDuration = (await players.current.first)!.audio.duration;
 
       /// get information meta from [.mp3]
       final readTag = await tagger.readTags(path: path);
@@ -393,10 +397,6 @@ final futureShowListMusic = FutureProvider.family.autoDispose<void, bool>((ref, 
       /// get artwork/image from [.mp3]
       final artwork = await tagger.readArtwork(path: path);
 
-      await players.open(Audio.file(path), autoStart: false);
-
-      final _result = await players.current.first;
-
       final title =
           (readTag.title?.isNotEmpty ?? false) ? readTag.title : basenameWithoutExtension(path);
 
@@ -406,17 +406,14 @@ final futureShowListMusic = FutureProvider.family.autoDispose<void, bool>((ref, 
         artwork: artwork,
         pathFile: path,
         tag: tagMetaData,
-        songDuration: _result!.audio.duration,
+        songDuration: songDuration,
       );
 
       /// For Music Playing
       tempList.add(music);
-      if (!withSync) {
-        musicBox.put(music.idMusic, music);
-      }
     }
   }
 
   tempList.sort((a, b) => (a.title ?? '').toLowerCase().compareTo((b.title ?? '').toLowerCase()));
-  _musicProvider._addListMusic(tempList, withSync: withSync);
+  await _musicProvider._addListMusic(tempList);
 });

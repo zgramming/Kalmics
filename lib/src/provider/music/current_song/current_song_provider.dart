@@ -1,4 +1,5 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../network/my_network.dart';
@@ -77,20 +78,31 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
 
   final music = map['music'] as MusicModel;
   final currentIndex = map['index'] as int;
+  try {
+    await _players.open(
+      Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
+      showNotification: true,
+      notificationSettings: sharedParameter.notificationSettings(
+        _globalContext!,
+        musics: _musics,
+      ),
+    );
 
-  await _players.open(
-    Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
-    showNotification: true,
-    notificationSettings: sharedParameter.notificationSettings(
-      _globalContext!,
-      musics: _musics,
-    ),
-  );
+    _currentSongProvider._setInitSong(music, index: currentIndex);
 
-  _currentSongProvider._setInitSong(music, index: currentIndex);
-
-  ///* Save History Recents Play
-  _recentPlayProvider.add(music);
+    ///* Save History Recents Play
+    _recentPlayProvider.add(music);
+  } on PlatformException catch (platformException) {
+    var message = 'Error when opening file';
+    if (platformException.code == 'OPEN') {
+      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+    }
+    _currentSongProvider.stopSong();
+    throw message;
+  } catch (e) {
+    _currentSongProvider.stopSong();
+    rethrow;
+  }
 });
 
 final previousSong = FutureProvider<MusicModel>((ref) async {
@@ -106,36 +118,48 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
   final lastIndex = _musics.length - 1;
   final currentIndex = _currentSong.currentIndex;
 
-  ///* Save Listen Song Duration Every Song
-  ref.read(setListenSong(_currentSong.song));
+  try {
+    ///* Save Listen Song Duration Every Song
+    ref.read(setListenSong(_currentSong.song));
 
-  var nextIndex = 0;
-  if (_musics.length > 1) {
-    /// Check if current index - 1 is Negative
-    /// if [true] play last index song
-    /// else play previous index song
+    var nextIndex = 0;
+    if (_musics.length > 1) {
+      /// Check if current index - 1 is Negative
+      /// if [true] play last index song
+      /// else play previous index song
 
-    nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
+      nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
+    }
+    final previousSong = _musics[nextIndex];
+
+    await _players.open(
+      Audio.file(
+        previousSong.pathFile ?? '',
+        metas: sharedParameter.metas(previousSong),
+      ),
+      showNotification: true,
+      notificationSettings: sharedParameter.notificationSettings(
+        _globalContext!,
+        musics: _musics,
+      ),
+    );
+    _currentSongProvider._setInitSong(previousSong, index: nextIndex);
+
+    ///* Save History Recents Play
+    _recentPlayProvider.add(previousSong);
+
+    return previousSong;
+  } on PlatformException catch (platformException) {
+    var message = 'Error when opening file';
+    if (platformException.code == 'OPEN') {
+      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+    }
+    _currentSongProvider.stopSong();
+    throw message;
+  } catch (e) {
+    _currentSongProvider.stopSong();
+    rethrow;
   }
-  final previousSong = _musics[nextIndex];
-
-  await _players.open(
-    Audio.file(
-      previousSong.pathFile ?? '',
-      metas: sharedParameter.metas(previousSong),
-    ),
-    showNotification: true,
-    notificationSettings: sharedParameter.notificationSettings(
-      _globalContext!,
-      musics: _musics,
-    ),
-  );
-  _currentSongProvider._setInitSong(previousSong, index: nextIndex);
-
-  ///* Save History Recents Play
-  _recentPlayProvider.add(previousSong);
-
-  return previousSong;
 });
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
@@ -152,55 +176,67 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
   final lastIndex = _musics.length - 1;
   final currentIndex = _currentSong.currentIndex;
 
-  ///* Save Listen Song Duration Every Song
-  ref.read(setListenSong(_currentSong.song));
+  try {
+    ///* Save Listen Song Duration Every Song
+    ref.read(setListenSong(_currentSong.song));
 
-  var nextIndex = 0;
-  if (_musics.length > 1) {
-    /// Check if current index + 1 exceeds the last index
-    /// if [true] play first index song
-    /// else play next index song
-    nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
+    var nextIndex = 0;
+    if (_musics.length > 1) {
+      /// Check if current index + 1 exceeds the last index
+      /// if [true] play first index song
+      /// else play next index song
+      nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
+    }
+    var nextSong = MusicModel();
+    switch (loopModeSetting) {
+      case LoopModeSetting.all:
+        nextSong = _musics[nextIndex];
+
+        await _players.open(
+          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            _globalContext!,
+            musics: _musics,
+          ),
+        );
+
+        _currentSongProvider._setInitSong(nextSong, index: nextIndex);
+        break;
+      case LoopModeSetting.single:
+        nextSong = _musics[currentIndex];
+        await _players.open(
+          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            _globalContext!,
+            musics: _musics,
+          ),
+        );
+
+        _currentSongProvider._setInitSong(nextSong, index: currentIndex);
+        break;
+      case LoopModeSetting.none:
+        nextSong = MusicModel();
+        await _players.stop();
+        _currentSongProvider.stopSong();
+        break;
+      default:
+    }
+
+    ///* Save History Recents Play
+    _recentPlayProvider.add(nextSong);
+
+    return nextSong;
+  } on PlatformException catch (platformException) {
+    var message = 'Error when opening file';
+    if (platformException.code == 'OPEN') {
+      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+    }
+    _currentSongProvider.stopSong();
+    throw message;
+  } catch (e) {
+    _currentSongProvider.stopSong();
+    rethrow;
   }
-  var nextSong = MusicModel();
-  switch (loopModeSetting) {
-    case LoopModeSetting.all:
-      nextSong = _musics[nextIndex];
-
-      await _players.open(
-        Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
-        showNotification: true,
-        notificationSettings: sharedParameter.notificationSettings(
-          _globalContext!,
-          musics: _musics,
-        ),
-      );
-
-      _currentSongProvider._setInitSong(nextSong, index: nextIndex);
-      break;
-    case LoopModeSetting.single:
-      nextSong = _musics[currentIndex];
-      await _players.open(
-        Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
-        showNotification: true,
-        notificationSettings: sharedParameter.notificationSettings(
-          _globalContext!,
-          musics: _musics,
-        ),
-      );
-
-      _currentSongProvider._setInitSong(nextSong, index: currentIndex);
-      break;
-    case LoopModeSetting.none:
-      nextSong = MusicModel();
-      await _players.stop();
-      _currentSongProvider.stopSong();
-      break;
-    default:
-  }
-
-  ///* Save History Recents Play
-  _recentPlayProvider.add(nextSong);
-
-  return nextSong;
 });

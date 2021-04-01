@@ -38,11 +38,51 @@ class MusicPlayerItem extends StatelessWidget {
             ListTile(
               onTap: () async {
                 final map = {'music': result, 'index': index};
-                context.refresh(playSong(map)).then((_) {
-                  showModalBottomSheet(
+                context
+                    .refresh(playSong(map))
+                    .then((_) => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (ctx) => MusicPlayerDetailScreen(),
+                        ))
+                    .catchError((error) {
+                  showDialog(
                     context: context,
-                    isScrollControlled: true,
-                    builder: (ctx) => MusicPlayerDetailScreen(),
+                    builder: (context) => AlertDialog(
+                      content: SizedBox(
+                        height: sizes.height(context) / 3,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    child: Image.asset('${appConfig.urlImageAsset}/error.png'),
+                                  ),
+                                ),
+                                Text(
+                                  error.toString(),
+                                  style: GoogleFonts.openSans(
+                                    color: Colors.red,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(primary: Colors.blue),
+                          child: Text('Sinkron ulang',
+                              style: GoogleFonts.openSans().copyWith(color: Colors.white)),
+                        )
+                      ],
+                    ),
                   );
                 });
               },

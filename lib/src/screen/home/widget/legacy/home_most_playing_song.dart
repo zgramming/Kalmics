@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../network/my_network.dart';
-import '../../../provider/my_provider.dart';
+import '../../../../network/my_network.dart';
+import '../../../../provider/my_provider.dart';
 
-class HomeMostPlayingSong extends StatelessWidget {
-  const HomeMostPlayingSong({
+// ignore: unused_element
+class _HomeMostPlayingSong extends StatelessWidget {
+  const _HomeMostPlayingSong({
     Key? key,
   }) : super(key: key);
 
@@ -36,7 +37,7 @@ class HomeMostPlayingSong extends StatelessWidget {
               final recentPlay = _recentsPlayMostPlayingSong['model'] as RecentPlayModel;
               final totalPlaying =
                   GlobalFunction.abbreviateNumber(_recentsPlayMostPlayingSong['total'] as int);
-              return HomeMostPlayingSongItem(
+              return _HomeMostPlayingSongItem(
                 recentPlay: recentPlay,
                 totalPlaying: totalPlaying,
               );
@@ -52,8 +53,8 @@ class HomeMostPlayingSong extends StatelessWidget {
   }
 }
 
-class HomeMostPlayingSongItem extends StatelessWidget {
-  const HomeMostPlayingSongItem({
+class _HomeMostPlayingSongItem extends StatelessWidget {
+  const _HomeMostPlayingSongItem({
     Key? key,
     required this.recentPlay,
     required this.totalPlaying,
