@@ -29,9 +29,11 @@ class SharedFunction {
           log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
 
           configFlutterLocalNotification
-              .showPlanNotification(
+              .showNotificationChangesToSong(
                 title: 'File Has Added',
                 body: '$basename Detect has added to application',
+                context: context,
+                pathFile: file.path,
               )
               .whenComplete(() => context.refresh(addMusic(file.path)));
         }
@@ -41,9 +43,11 @@ class SharedFunction {
           log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
 
           configFlutterLocalNotification
-              .showPlanNotification(
+              .showNotificationChangesToSong(
                 title: 'File Has Remove',
                 body: '$basename Detect has Remove from application',
+                context: context,
+                pathFile: file.path,
               )
               .then((_) => context.refresh(removeMusic(file.path)));
         }
@@ -52,9 +56,11 @@ class SharedFunction {
 
         if (event.type == ChangeType.MODIFY) {
           log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
-          configFlutterLocalNotification.showPlanNotification(
+          configFlutterLocalNotification.showNotificationChangesToSong(
             title: 'File Has Modify',
             body: '$basename Detect has Modify to application',
+            context: context,
+            pathFile: file.path,
           );
         }
       }
@@ -84,7 +90,13 @@ class SharedFunction {
           /// Listen to current duration & total duration song
           /// If current duration exceeds the total song duration, Then Play Next Song
           if (currentDuration.inSeconds >= totalDuration) {
-            context.refresh(nextSong);
+            context.refresh(nextSong).catchError((error) {
+              GlobalFunction.showSnackBar(
+                context,
+                content: Text(error.toString()),
+                snackBarType: SnackBarType.error,
+              );
+            });
           }
         }
       }
