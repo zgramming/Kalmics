@@ -54,7 +54,7 @@ class OnboardingScreen extends StatelessWidget {
               return;
             }
             context.read(isLoading).state = true;
-            context.refresh(futureShowListMusic).then((_) async {
+            context.refresh(initializeMusicFromStorage).then((_) async {
               context.read(isLoading).state = false;
               await context
                   .read(settingProvider)
@@ -68,19 +68,20 @@ class OnboardingScreen extends StatelessWidget {
           },
           items: [
             OnboardingItem(
-              logo: Icon(
-                Icons.design_services,
-                color: Colors.white,
-                size: sizes.width(context) / 1.5,
+              logo: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Image.asset(
+                  '${appConfig.urlImageAsset}/${ConstString.assetIconMusic}',
+                  fit: BoxFit.cover,
+                ),
               ),
-              title: 'Tampilan yang ciamik Tampilan yang ciamik Tampilan yang ciamik ',
+              title: 'Tampilan Musik Kekinian',
+              subtitle: '',
               titleStyle: GoogleFonts.montserrat(
                 fontSize: sizes.width(context) / 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              subtitle:
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
               subtitleStyle: GoogleFonts.openSans(
                 fontSize: sizes.width(context) / 30,
                 fontWeight: FontWeight.w400,
@@ -88,19 +89,35 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
             OnboardingItem(
-              logo: Icon(
-                Icons.music_note,
-                color: Colors.white,
-                size: sizes.width(context) / 1.5,
+              logo: Image.asset(
+                '${appConfig.urlImageAsset}/${ConstString.assetIconChart}',
+                fit: BoxFit.cover,
               ),
-              title: 'Tampilan yang ciamik Tampilan yang ciamik Tampilan yang ciamik ',
+              title: 'Fitur-fitur yang menarik',
               titleStyle: GoogleFonts.montserrat(
                 fontSize: sizes.width(context) / 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              subtitle:
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+              subtitle: "",
+              subtitleStyle: GoogleFonts.openSans(
+                fontSize: sizes.width(context) / 30,
+                fontWeight: FontWeight.w400,
+                color: Colors.white,
+              ),
+            ),
+            OnboardingItem(
+              logo: Image.asset(
+                '${appConfig.urlImageAsset}/${ConstString.assetIconPersonListen}',
+                fit: BoxFit.cover,
+              ),
+              title: 'Mainkan lagu pertamamu',
+              titleStyle: GoogleFonts.montserrat(
+                fontSize: sizes.width(context) / 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              subtitle: "",
               subtitleStyle: GoogleFonts.openSans(
                 fontSize: sizes.width(context) / 30,
                 fontWeight: FontWeight.w400,
