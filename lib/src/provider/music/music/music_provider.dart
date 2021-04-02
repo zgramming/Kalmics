@@ -104,7 +104,8 @@ final musicProvider = StateNotifierProvider((ref) => MusicProvider());
 
 final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {
   final musics = ref.watch(musicProvider.state);
-  final result = musics.firstWhere((element) => element.idMusic == idMusic);
+  final result =
+      musics.firstWhere((element) => element.idMusic == idMusic, orElse: () => MusicModel());
   if (result.idMusic.isEmpty) {
     return MusicModel();
   }
@@ -347,7 +348,7 @@ final editArtworkSong = FutureProvider.family<void, MusicModel>((ref, music) asy
   }
 });
 
-final futureShowListMusic = FutureProvider.autoDispose<void>((ref) async {
+final initializeMusicFromStorage = FutureProvider.autoDispose<void>((ref) async {
   final _musicProvider = ref.watch(musicProvider);
   final players = AssetsAudioPlayer.withId(ConstString.idAssetAudioPlayer);
   final tagger = Audiotagger();

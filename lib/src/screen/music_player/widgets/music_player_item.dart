@@ -40,52 +40,62 @@ class MusicPlayerItem extends StatelessWidget {
                 final map = {'music': result, 'index': index};
                 context
                     .refresh(playSong(map))
-                    .then((_) => showModalBottomSheet(
+                    .then(
+                      (_) => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (ctx) => MusicPlayerDetailScreen(),
+                      ),
+                    )
+                    .catchError((error) => showDialog(
                           context: context,
-                          isScrollControlled: true,
-                          builder: (ctx) => MusicPlayerDetailScreen(),
-                        ))
-                    .catchError((error) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      content: SizedBox(
-                        height: sizes.height(context) / 3,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    child: Image.asset(
-                                        '${appConfig.urlImageAsset}/${ConstString.assetIconErrorSongNotFound}'),
+                          builder: (context) => AlertDialog(
+                            content: SizedBox(
+                              height: sizes.height(context) / 3,
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Expanded(
+                                        child: ClipRRect(
+                                          child: Image.asset(
+                                              '${appConfig.urlImageAsset}/${ConstString.assetIconErrorSongNotFound}'),
+                                        ),
+                                      ),
+                                      Text(
+                                        error.toString(),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  error.toString(),
-                                  style: GoogleFonts.openSans(
-                                    color: Colors.red,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              ],
+                              ),
                             ),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  context.read(isLoading).state = true;
+                                  context
+                                      .refresh(initializeMusicFromStorage)
+                                      .then((_) => context.read(isLoading).state = false)
+                                      .then((value) => Navigator.of(context).pop());
+                                },
+                                style: ElevatedButton.styleFrom(primary: Colors.blue),
+                                child: Text(
+                                  'Sinkron ulang',
+                                  style: GoogleFonts.openSans().copyWith(color: Colors.white),
+                                ),
+                              )
+                            ],
                           ),
-                        ),
-                      ),
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(primary: Colors.blue),
-                          child: Text('Sinkron ulang',
-                              style: GoogleFonts.openSans().copyWith(color: Colors.white)),
-                        )
-                      ],
-                    ),
-                  );
-                });
+                        ));
               },
               leading: InkWell(
                 onTap: () => showModalBottomSheet(
