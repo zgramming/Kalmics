@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kalmics/src/config/my_config.dart';
 
 /// For loading builder in ProviderListener
-final isLoading = StateProvider<bool>((ref) => false);
+final isLoading = StateProvider.autoDispose<bool>((ref) => false);
 
 /// Global Context
 final globalContext = StateProvider<BuildContext?>((ref) => null);
