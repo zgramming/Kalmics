@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 
-import 'package:kalmics/src/network/my_network.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+import '../../network/my_network.dart';
+import '../../provider/my_provider.dart';
 
 class SharedParameter {
   Metas metas(MusicModel music) {

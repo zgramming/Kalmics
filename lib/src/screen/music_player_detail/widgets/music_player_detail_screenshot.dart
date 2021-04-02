@@ -54,7 +54,7 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
                           height: sizes.height(context),
                           width: sizes.width(context),
                           errorBuilder: (context, error, stackTrace) => Image.asset(
-                            '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                            appConfig.fullPathImageAsset,
                             fit: BoxFit.cover,
                             height: sizes.height(context),
                             width: sizes.width(context),
@@ -94,8 +94,7 @@ class _MusicPlayerDetailScreenshotState extends State<MusicPlayerDetailScreensho
                           child: CircleAvatar(
                             radius: sizes.width(context) / 30,
                             backgroundColor: Colors.transparent,
-                            backgroundImage:
-                                AssetImage('${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}'),
+                            backgroundImage: AssetImage(appConfig.fullPathImageAsset),
                           ),
                         ),
                       ],

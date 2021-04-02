@@ -44,7 +44,7 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
           axis: Axis.horizontal,
           child: artwork == null
               ? Image.asset(
-                  '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                  appConfig.fullPathImageAsset,
                   fit: BoxFit.cover,
                   width: sizes.width(context),
                 )
@@ -55,7 +55,7 @@ class _MusicPlayerDetailImageState extends State<MusicPlayerDetailImage>
                   width: sizes.width(context),
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                      appConfig.fullPathImageAsset,
                       fit: BoxFit.cover,
                       width: sizes.width(context),
                     );

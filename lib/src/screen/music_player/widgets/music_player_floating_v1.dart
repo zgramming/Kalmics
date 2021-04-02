@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/config/const/const_size.dart';
 
+import '../../../config/my_config.dart';
 import '../../../provider/my_provider.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
 
@@ -64,7 +64,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         child: artwork == null
                             ? Image.asset(
-                                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                appConfig.fullPathImageAsset,
                                 fit: BoxFit.cover,
                               )
                             : Image.memory(
@@ -74,7 +74,7 @@ class FloatingMusicPlayerV1 extends StatelessWidget {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.asset(
-                                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                      appConfig.fullPathImageAsset,
                                       fit: BoxFit.cover,
                                     ),
                                   );

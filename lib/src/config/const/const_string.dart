@@ -44,13 +44,13 @@ class ConstString {
   static const androidMinimizeChannel = MethodChannel('channel_minimize');
   static const androidMinimizeFunction = 'minimize_app';
 
-  ///? Setting Screen
-  ///* Word [Give Rating]
+  ///* Word
   static const giveRating = 'Berikan Rating';
-
-  ///* Word [Copyright Icon Permission]
   static const copyrightPermission = 'Copyright Icon';
+  static const lastSongPlayed = 'LAGU TERAKHIR DIPUTAR';
+  static const mostSongPlayed = 'PALING BANYAK DIDENGAR';
 
+  ///* Url Social Media
   static const urlFacebook = 'https://www.facebook.com/zeffry.reynando/';
   static const urlGithub = 'https://github.com/zgramming';
   static const urlGmail = 'zeffry.reynando@gmail.com';
@@ -58,8 +58,18 @@ class ConstString {
   static const urlInstagram = 'https://www.instagram.com/zeffry_reynando/';
   static const urlIcons8 = 'https://icons8.com';
 
+  ///* Defaul Text When Launch Email with [url_launcher]
   static const subjectEmail = 'Kalmics App';
   static const bodyEmail = 'Hello Zeffry Reynando !';
 
-  static const lastSongPlayed = 'LAGU TERAKHIR DIPUTAR';
+  ///* Icon Name Image
+  static const assetIconGummyIpod = 'gummy-ipod.png';
+  static const assetIconErrorSongNotFound = 'error.png';
+  static const assetIconIcons8 = 'icons8.png';
+
+  ///* Error Text
+  static const defaultErrorPlayingSong = 'Tidak dapat memainkan musik';
+  static const songNotFoundInDirectory =
+      'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+  static const menuPopUpButtonNotValid = 'Pilihan tidak valid';
 }

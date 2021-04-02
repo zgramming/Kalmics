@@ -45,9 +45,7 @@ class ConfigFlutterLocalNotification {
       final fileLargeIcon = File(path);
       Uint8List byteFile;
       if (_music.artwork == null) {
-        byteFile = (await rootBundle.load('${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}'))
-            .buffer
-            .asUint8List();
+        byteFile = (await rootBundle.load(appConfig.fullPathImageAsset)).buffer.asUint8List();
       } else {
         byteFile = _music.artwork!;
       }

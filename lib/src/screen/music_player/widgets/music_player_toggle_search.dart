@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+
+import '../../../provider/my_provider.dart';
 
 class MusicPlayerToggleSearch extends StatelessWidget {
   const MusicPlayerToggleSearch({

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:global_template/global_template.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/config/my_config.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
 import '../welcome/welcome_screen.dart';
 

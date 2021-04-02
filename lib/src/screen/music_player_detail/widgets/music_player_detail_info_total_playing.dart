@@ -26,7 +26,7 @@ class MusicPlayerDetailInfoTotalPlaying extends ConsumerWidget {
                 ? ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                     child: Image.asset(
-                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                      appConfig.fullPathImageAsset,
                       fit: BoxFit.cover,
                       width: sizes.width(context),
                       height: sizes.height(context),

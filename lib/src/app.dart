@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'screen/music_player/music_player_screen.dart';
-import 'screen/music_player_detail/music_player_detail_screen.dart';
-import 'screen/splash/splash_screen.dart';
-import 'screen/welcome/welcome_screen.dart';
+import './screen/music_player/music_player_screen.dart';
+import './screen/music_player_detail/music_player_detail_screen.dart';
+import './screen/splash/splash_screen.dart';
+import './screen/welcome/welcome_screen.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

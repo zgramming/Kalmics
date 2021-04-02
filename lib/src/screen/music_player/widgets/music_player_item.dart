@@ -59,7 +59,8 @@ class MusicPlayerItem extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: ClipRRect(
-                                    child: Image.asset('${appConfig.urlImageAsset}/error.png'),
+                                    child: Image.asset(
+                                        '${appConfig.urlImageAsset}/${ConstString.assetIconErrorSongNotFound}'),
                                   ),
                                 ),
                                 Text(
@@ -127,7 +128,7 @@ class MusicPlayerItem extends StatelessWidget {
                   ),
                   child: artwork == null
                       ? ShowImageAsset(
-                          imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                          imageUrl: appConfig.fullPathImageAsset,
                           fit: BoxFit.cover,
                         )
                       : Image.memory(
@@ -135,7 +136,7 @@ class MusicPlayerItem extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return ShowImageAsset(
-                              imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                              imageUrl: appConfig.fullPathImageAsset,
                               fit: BoxFit.cover,
                             );
                           },
@@ -178,7 +179,7 @@ class MusicPlayerItem extends StatelessWidget {
                         default:
                           GlobalFunction.showSnackBar(
                             context,
-                            content: const Text('Pilihan tidak valid'),
+                            content: const Text(ConstString.menuPopUpButtonNotValid),
                             snackBarType: SnackBarType.error,
                           );
                       }

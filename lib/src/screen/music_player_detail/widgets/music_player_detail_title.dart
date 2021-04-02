@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share/share.dart';
 
 import '../../../provider/my_provider.dart';
+import './music_player_detail_info_total_playing.dart';
 import './music_player_detail_screenshot.dart';
-import 'music_player_detail_info_total_playing.dart';
 
 class MusicPlayerDetailTitle extends StatefulWidget {
   @override

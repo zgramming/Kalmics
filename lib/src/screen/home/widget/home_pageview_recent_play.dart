@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../config/my_config.dart';
 import '../../../provider/my_provider.dart';
-
 import './home_pageview_recent_play_item.dart';
 
 class HomePageViewRecentPlay extends StatefulWidget {
@@ -33,7 +33,7 @@ class HomePageViewRecentPlayState extends State<HomePageViewRecentPlay>
                     children: [
                       Flexible(
                         child: Image.asset(
-                          '${appConfig.urlImageAsset}/gummy-ipod.png',
+                          '${appConfig.urlImageAsset}/${ConstString.assetIconGummyIpod}',
                           fit: BoxFit.cover,
                         ),
                       ),

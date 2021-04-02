@@ -27,7 +27,7 @@ class SettingScreen extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                    appConfig.fullPathImageAsset,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -152,7 +152,7 @@ class SettingDialogIconCopyright extends StatelessWidget {
           children: [
             Expanded(
               child: Image.asset(
-                '${appConfig.urlImageAsset}/icons8.png',
+                '${appConfig.urlImageAsset}/${ConstString.assetIconIcons8}',
               ),
             ),
             Expanded(

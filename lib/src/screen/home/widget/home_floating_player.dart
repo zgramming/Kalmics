@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../provider/my_provider.dart';
 import '../../music_player_detail/music_player_detail_screen.dart';
 
@@ -33,7 +34,7 @@ class HomeFloatingPlayer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                     child: _currengSongProvider.song.artwork == null
                         ? ShowImageAsset(
-                            imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                            imageUrl: appConfig.fullPathImageAsset,
                             fit: BoxFit.cover,
                           )
                         : Image.memory(
@@ -41,7 +42,7 @@ class HomeFloatingPlayer extends StatelessWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                appConfig.fullPathImageAsset,
                                 fit: BoxFit.cover,
                                 width: sizes.width(context),
                               );

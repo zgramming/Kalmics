@@ -1,6 +1,7 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kalmics/src/config/my_config.dart';
 
 import '../../../network/my_network.dart';
 import '../../../shared/my_shared.dart';
@@ -93,9 +94,9 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
     ///* Save History Recents Play
     _recentPlayProvider.add(music);
   } on PlatformException catch (platformException) {
-    var message = 'Error when opening file';
+    var message = ConstString.defaultErrorPlayingSong;
     if (platformException.code == 'OPEN') {
-      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+      message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
     throw message;
@@ -150,9 +151,9 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 
     return previousSong;
   } on PlatformException catch (platformException) {
-    var message = 'Error when opening file';
+    var message = ConstString.defaultErrorPlayingSong;
     if (platformException.code == 'OPEN') {
-      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+      message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
     throw message;
@@ -229,9 +230,9 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 
     return nextSong;
   } on PlatformException catch (platformException) {
-    var message = 'Error when opening file';
+    var message = ConstString.defaultErrorPlayingSong;
     if (platformException.code == 'OPEN') {
-      message = 'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+      message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
     throw message;

@@ -109,7 +109,7 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
                         borderRadius: BorderRadius.circular(15.0),
                         child: result.music.artwork == null
                             ? ShowImageAsset(
-                                imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                imageUrl: appConfig.fullPathImageAsset,
                                 fit: BoxFit.cover,
                               )
                             : Image.memory(
@@ -118,8 +118,7 @@ class _HomePageViewRecentPlayItemState extends State<HomePageViewRecentPlayItem>
                                 width: sizes.width(context),
                                 errorBuilder: (context, error, stackTrace) {
                                   return ShowImageAsset(
-                                    imageUrl:
-                                        '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                    imageUrl: appConfig.fullPathImageAsset,
                                     fit: BoxFit.cover,
                                   );
                                 },

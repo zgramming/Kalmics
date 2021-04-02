@@ -7,10 +7,9 @@ import 'package:global_template/global_template.dart';
 import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
 
+import './widgets/music_player_appbar.dart';
 import './widgets/music_player_floating_v1.dart';
 import './widgets/music_player_list.dart';
-
-import 'widgets/music_player_appbar.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
   static const routeNamed = '/music-player-screen';

@@ -24,7 +24,7 @@ class MusicPlayerDetailScreen extends StatelessWidget {
                 final _currentSongProvider = watch(currentSongProvider.state);
                 if (_currentSongProvider.song.artwork == null) {
                   return ShowImageAsset(
-                    imageUrl: '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                    imageUrl: appConfig.fullPathImageAsset,
                     fit: BoxFit.cover,
                   );
                 } else {
@@ -33,7 +33,7 @@ class MusicPlayerDetailScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                        appConfig.fullPathImageAsset,
                         fit: BoxFit.cover,
                         colorBlendMode: BlendMode.darken,
                       );

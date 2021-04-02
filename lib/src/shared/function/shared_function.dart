@@ -9,11 +9,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kalmics/src/network/model/music/music_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watcher/watcher.dart';
 
 import '../../config/my_config.dart';
+import '../../network/my_network.dart';
 import '../../provider/my_provider.dart';
 
 class SharedFunction {

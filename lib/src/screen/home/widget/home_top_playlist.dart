@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/network/my_network.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+
+import '../../../config/my_config.dart';
+import '../../../network/my_network.dart';
+import '../../../provider/my_provider.dart';
 
 class HomeTopPlaylist extends StatelessWidget {
   const HomeTopPlaylist({
@@ -24,7 +26,7 @@ class HomeTopPlaylist extends StatelessWidget {
             return Column(
               children: [
                 Text(
-                  'PALING BANYAK DIDENGAR',
+                  ConstString.mostSongPlayed,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.montserrat(
                     fontWeight: FontWeight.bold,
@@ -56,7 +58,7 @@ class HomeTopPlaylist extends StatelessWidget {
                               ),
                               child: music.artwork == null
                                   ? Image.asset(
-                                      '${appConfig.urlImageAsset}/${appConfig.nameLogoAsset}',
+                                      appConfig.fullPathImageAsset,
                                       fit: BoxFit.cover,
                                     )
                                   : Image.memory(

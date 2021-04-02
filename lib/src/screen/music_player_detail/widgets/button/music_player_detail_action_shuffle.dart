@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:global_template/global_template.dart';
-import 'package:kalmics/src/config/my_config.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+import 'package:global_template/global_template.dart';
+
+import '../../../../config/my_config.dart';
+import '../../../../provider/my_provider.dart';
 
 class MusicPlayerDetailActionShuffle extends ConsumerWidget {
   @override

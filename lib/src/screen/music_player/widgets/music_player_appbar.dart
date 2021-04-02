@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'music_player_action_more.dart';
-import 'music_player_toggle_search.dart';
+import './music_player_action_more.dart';
+import './music_player_toggle_search.dart';
 
 class MusicPlayerAppBar extends StatelessWidget {
   const MusicPlayerAppBar({

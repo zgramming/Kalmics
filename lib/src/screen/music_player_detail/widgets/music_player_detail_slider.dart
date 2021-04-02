@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kalmics/src/provider/my_provider.dart';
+
+import '../../../provider/my_provider.dart';
 
 class MusicPlayerDetailSlider extends StatelessWidget {
   @override
@@ -52,19 +51,16 @@ class MusicPlayerDetailSlider extends StatelessWidget {
                     final newDuration = Duration(seconds: value.toInt());
                     await players.seek(newDuration);
                     context.read(currentSongProvider).setDuration(newDuration);
-                    log('onChangeStart $value newDuration $newDuration');
                   },
                   onChanged: (value) async {
                     final newDuration = Duration(seconds: value.toInt());
                     await players.seek(newDuration);
                     context.read(currentSongProvider).setDuration(newDuration);
-                    log('onChange $value || newDuration $newDuration');
                   },
                   onChangeEnd: (value) async {
                     final newDuration = Duration(seconds: value.toInt());
                     await players.seek(newDuration);
                     context.read(currentSongProvider).setDuration(newDuration);
-                    log('onChangeEnd $value || newDuration $newDuration');
                   },
                 );
               },
