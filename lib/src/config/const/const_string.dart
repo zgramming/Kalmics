@@ -66,10 +66,12 @@ class ConstString {
   static const assetIconGummyIpod = 'gummy-ipod.png';
   static const assetIconErrorSongNotFound = 'error.png';
   static const assetIconIcons8 = 'icons8.png';
+  static const assetIconMusic = 'music.png';
+  static const assetIconChart = 'chart.png';
+  static const assetIconPersonListen = 'person_listen.png';
 
   ///* Error Text
   static const defaultErrorPlayingSong = 'Tidak dapat memainkan musik';
-  static const songNotFoundInDirectory =
-      'Gagal memainkan lagu, pastikan file lagu tersedia di storage kamu';
+  static const songNotFoundInDirectory = 'Lagu tidak ditemukan di storage kamu';
   static const menuPopUpButtonNotValid = 'Pilihan tidak valid';
 }
