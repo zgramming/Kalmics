@@ -8,7 +8,40 @@ import '../../config/my_config.dart';
 import '../../provider/my_provider.dart';
 import '../welcome/welcome_screen.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController animationController;
+  late final Animation<Offset> translateAnimation;
+  late final Animation<double> scaleAnimation;
+  late final Animation<double> rotateAnimation;
+
+  @override
+  void initState() {
+    animationController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+
+    translateAnimation = Tween<Offset>(begin: Offset(200, 0), end: Offset(0, 0))
+        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.1, 1)));
+
+    scaleAnimation = Tween<double>(begin: 1, end: 1.5)
+        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.7, 1)));
+
+    rotateAnimation = Tween<double>(begin: 0, end: -0.25)
+        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.9, 1)));
+
+    animationController.forward();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,11 +58,12 @@ class OnboardingScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              ...ConstColor.backgroundColorGradient(),
-            ],
+            colors: ConstColor.backgroundColorGradient(),
           ),
-          onPageChanged: (index) {},
+          onPageChanged: (index) {
+            animationController.reset();
+            animationController.forward();
+          },
           onClickNext: (index) {},
           onClickFinish: () async {
             final permissionStorage = await Permission.storage.status;
@@ -68,30 +102,30 @@ class OnboardingScreen extends StatelessWidget {
           },
           items: [
             OnboardingItem(
-              logo: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Image.asset(
-                  '${appConfig.urlImageAsset}/${ConstString.assetIconMusic}',
-                  fit: BoxFit.cover,
+              logo: Align(
+                alignment: Alignment.bottomCenter,
+                child: _AnimatedBuilder(
+                  animationController: animationController,
+                  translateAnimation: translateAnimation,
+                  scaleAnimation: scaleAnimation,
+                  rotateAnimation: rotateAnimation,
+                  icon: Icons.music_note,
                 ),
               ),
               title: 'Tampilan Musik Kekinian',
-              subtitle: '',
               titleStyle: GoogleFonts.montserrat(
                 fontSize: sizes.width(context) / 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              subtitleStyle: GoogleFonts.openSans(
-                fontSize: sizes.width(context) / 30,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-              ),
             ),
             OnboardingItem(
-              logo: Image.asset(
-                '${appConfig.urlImageAsset}/${ConstString.assetIconChart}',
-                fit: BoxFit.cover,
+              logo: _AnimatedBuilder(
+                animationController: animationController,
+                translateAnimation: translateAnimation,
+                scaleAnimation: scaleAnimation,
+                rotateAnimation: rotateAnimation,
+                icon: Icons.tag,
               ),
               title: 'Fitur-fitur yang menarik',
               titleStyle: GoogleFonts.montserrat(
@@ -99,17 +133,14 @@ class OnboardingScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              subtitle: "",
-              subtitleStyle: GoogleFonts.openSans(
-                fontSize: sizes.width(context) / 30,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-              ),
             ),
             OnboardingItem(
-              logo: Image.asset(
-                '${appConfig.urlImageAsset}/${ConstString.assetIconPersonListen}',
-                fit: BoxFit.cover,
+              logo: _AnimatedBuilder(
+                animationController: animationController,
+                translateAnimation: translateAnimation,
+                scaleAnimation: scaleAnimation,
+                rotateAnimation: rotateAnimation,
+                icon: Icons.play_arrow_rounded,
               ),
               title: 'Mainkan lagu pertamamu',
               titleStyle: GoogleFonts.montserrat(
@@ -117,14 +148,46 @@ class OnboardingScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              subtitle: "",
-              subtitleStyle: GoogleFonts.openSans(
-                fontSize: sizes.width(context) / 30,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedBuilder extends StatelessWidget {
+  const _AnimatedBuilder({
+    Key? key,
+    required this.animationController,
+    required this.translateAnimation,
+    required this.scaleAnimation,
+    required this.rotateAnimation,
+    required this.icon,
+  }) : super(key: key);
+
+  final AnimationController animationController;
+  final Animation<Offset> translateAnimation;
+  final Animation<double> scaleAnimation;
+  final Animation<double> rotateAnimation;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (context, child) => Transform.translate(
+        offset: translateAnimation.value,
+        child: Transform.scale(
+          scale: scaleAnimation.value,
+          child: Transform.rotate(
+            angle: rotateAnimation.value,
+            child: Icon(
+              icon,
+              size: sizes.width(context) / 2,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
