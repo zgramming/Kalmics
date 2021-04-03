@@ -59,6 +59,7 @@ class HomeTopPlaylist extends StatelessWidget {
                               child: music.artwork == null
                                   ? Image.asset(
                                       appConfig.fullPathImageAsset,
+                                      height: 100,
                                       fit: BoxFit.cover,
                                     )
                                   : Image.memory(
@@ -70,7 +71,7 @@ class HomeTopPlaylist extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            flex: 4,
+                            flex: 3,
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 final maxWidth = constraints.maxWidth;
@@ -96,7 +97,8 @@ class HomeTopPlaylist extends StatelessWidget {
                                       music.tag?.artist ?? '',
                                       style: GoogleFonts.openSans(
                                         color: Colors.white,
-                                        fontSize: 9,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w300,
                                       ),
                                     ),
                                     const SizedBox(height: 10),
@@ -117,26 +119,22 @@ class HomeTopPlaylist extends StatelessWidget {
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      total,
+                                      textAlign: TextAlign.right,
+                                      style: GoogleFonts.montserrat(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontSize: 28,
+                                      ),
+                                    )
                                   ],
                                 );
                               },
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: FittedBox(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  total,
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          SizedBox(width: 10),
                         ],
                       ),
                     );

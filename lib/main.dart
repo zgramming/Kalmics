@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:hive/hive.dart';
@@ -23,6 +24,7 @@ class DurationAdapter extends TypeAdapter<Duration> {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   appConfig.configuration(nameLogoAsset: 'Kalmics.png');
 
   final appDocumentDir = await getApplicationDocumentsDirectory();
