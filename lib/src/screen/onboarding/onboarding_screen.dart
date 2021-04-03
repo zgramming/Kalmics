@@ -93,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
               await context
                   .read(settingProvider)
                   .setSettingOnboardingScreen(value: ConstString.finishedOnboarding);
-              Navigator.of(context).pushNamed(WelcomeScreen.routeNamed);
+              Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed);
             }).catchError((error) {
               context.read(isLoading).state = false;
               GlobalFunction.showSnackBar(context,
