@@ -91,11 +91,13 @@ Pull requests are welcome. For major changes, please open an issue first to disc
     </thead>
     <tbody>
         <tr>
-            <td><img href="https://github.com/zgramming/" target="_blank" src="screenshot/icons/icon_github.png" width=48 height=48></td>
-            <td><img href="https://www.linkedin.com/in/zeffry-reynando" target="_blank" src="screenshot/icons/icon_linkedin.png" width=48 height=48></td>
-            <td><img href="https://www.facebook.com/zeffry.reynando" target="_blank" src="screenshot/icons/icon_fb.png" width=48 height=48></td>
-            <td><img href="https://www.instagram.com/zeffry_reynando" target="_blank" src="screenshot/icons/icon_instagram.png" width=48 height=48></td>
-            <td><img href="https://zeffry.devatbase.com/" target="_blank" src="screenshot/icons/icon_website.png" width=48 height=48></td>
+            <td>
+            <a href="https://github.com/zgramming/" target="_blank"><img src="screenshot/icons/icon_github.png" width=48 height=48></a>
+            </td>
+            <td><a href="https://www.linkedin.com/in/zeffry-reynando" target="_blank"><img src="screenshot/icons/icon_linkedin.png" width=48 height=48></a></td>
+            <td><a href="https://www.facebook.com/zeffry.reynando" target="_blank"><img src="screenshot/icons/icon_fb.png" width=48 height=48></a></td>
+            <td><a href="https://www.instagram.com/zeffry_reynando" target="_blank"><img src="screenshot/icons/icon_instagram.png" width=48 height=48></a></td>
+            <td><a href="https://zeffry.devatbase.com/" target="_blank"><img src="screenshot/icons/icon_website.png" width=48 height=48></a></td>
         </tr>
     </tbody>
 
