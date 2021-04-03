@@ -5,6 +5,9 @@
   <img src="screenshot/banner.png" height="400">
 </p>
 
+# Get it on : 
+<a href="https://play.google.com/store/apps/details?id=reynando.zeffry.kalmics" target="_blank"><img src="screenshot/icons/playstore.png" width=48 height=48></a>
+
 # Kalmics
 
 Simple application to play music on your storage
