@@ -227,7 +227,7 @@ final removeMusic = FutureProvider.family<void, String>((ref, path) async {
 });
 
 final addMusic = FutureProvider.family<void, String>((ref, path) async {
-  final players = ref.read(globalAudioPlayers).state;
+  final players = AssetsAudioPlayer();
   final _musicProvider = ref.read(musicProvider);
   final musics = ref.read(musicProvider.state);
   const uuid = Uuid();
