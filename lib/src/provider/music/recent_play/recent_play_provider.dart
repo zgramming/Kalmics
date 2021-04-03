@@ -146,18 +146,18 @@ final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
   final _recentsPlay = ref.watch(recentPlayProvider.state);
   final _musics = ref.watch(musicProvider.state);
 
-  ///* Save title song as key
-  final tempMap = <dynamic, int>{};
+  ///* Save path song as key
+  final tempMap = <String, int>{};
   final tempMap2 = <MusicModel, int>{};
 
   for (final recent in _recentsPlay) {
-    final original = tempMap[recent.music.idMusic];
+    final original = tempMap[recent.music.pathFile];
     if (original == null) {
-      tempMap[recent.music.idMusic] = 1;
+      tempMap[recent.music.pathFile!] = 1;
     } else {
-      final currentValue = tempMap[recent.music.idMusic] ?? 9999;
+      final currentValue = tempMap[recent.music.pathFile] ?? 9999;
       final result = currentValue + 1;
-      tempMap[recent.music.idMusic] = result;
+      tempMap[recent.music.pathFile!] = result;
     }
   }
 
@@ -170,7 +170,7 @@ final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
     final map = Map.fromEntries(tempEntries);
     for (final item in map.entries) {
       final music =
-          _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());
+          _musics.firstWhere((element) => element.pathFile == item.key, orElse: () => MusicModel());
       if (music.idMusic.isNotEmpty) {
         tempMap2[music] = item.value;
       }
@@ -185,7 +185,7 @@ final recentsPlay5TopChart = StateProvider<Map<MusicModel, int>>((ref) {
 
   for (final item in result.entries) {
     final music =
-        _musics.firstWhere((element) => element.idMusic == item.key, orElse: () => MusicModel());
+        _musics.firstWhere((element) => element.pathFile == item.key, orElse: () => MusicModel());
     if (music.idMusic.isNotEmpty) {
       tempMap2[music] = item.value;
     }
