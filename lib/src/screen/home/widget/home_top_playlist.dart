@@ -134,7 +134,7 @@ class HomeTopPlaylist extends StatelessWidget {
                               },
                             ),
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                         ],
                       ),
                     );

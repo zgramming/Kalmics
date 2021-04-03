@@ -72,9 +72,6 @@ flutter:
     - assets/images/gummy-ipod.png
     - assets/images/icons8.png
     - assets/images/error.png
-    - assets/images/chart.png
-    - assets/images/music.png
-    - assets/images/person_listen.png
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

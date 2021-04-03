@@ -23,14 +23,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
   void initState() {
     animationController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
 
-    translateAnimation = Tween<Offset>(begin: Offset(200, 0), end: Offset(0, 0))
-        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.1, 1)));
+    translateAnimation = Tween<Offset>(begin: const Offset(200, 0), end: const Offset(0, 0))
+        .animate(CurvedAnimation(parent: animationController, curve: const Interval(0.1, 1)));
 
     scaleAnimation = Tween<double>(begin: 1, end: 1.5)
-        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.7, 1)));
+        .animate(CurvedAnimation(parent: animationController, curve: const Interval(0.7, 1)));
 
     rotateAnimation = Tween<double>(begin: 0, end: -0.25)
-        .animate(CurvedAnimation(parent: animationController, curve: Interval(0.9, 1)));
+        .animate(CurvedAnimation(parent: animationController, curve: const Interval(0.9, 1)));
 
     animationController.forward();
     super.initState();
