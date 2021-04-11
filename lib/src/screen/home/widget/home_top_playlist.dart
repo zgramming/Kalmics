@@ -103,15 +103,15 @@ class HomeTopPlaylist extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 10),
                                     Container(
-                                      height: 20,
+                                      height: 8,
                                       margin: EdgeInsets.only(right: _increasePercentace),
                                       decoration: const BoxDecoration(
                                         color: Colors.white,
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.green,
-                                            blurRadius: 2,
-                                            offset: Offset(2, 2),
+                                            blurRadius: 1,
+                                            offset: Offset(1.5, 1.5),
                                           )
                                         ],
                                         borderRadius: BorderRadius.horizontal(
