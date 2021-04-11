@@ -141,6 +141,10 @@ final filteredMusic = StateProvider<List<MusicModel>>((ref) {
         .toList();
   }
 
+  if (result.isEmpty) {
+    return [];
+  }
+
   if (result.isNotEmpty) {
     /// Sorting [Ascending/Descending]
     if (_settingProvider.sortByType == SortByType.ascending) {
@@ -176,10 +180,6 @@ final filteredMusic = StateProvider<List<MusicModel>>((ref) {
         return sortingChoice;
       });
     }
-  }
-
-  if (result.isEmpty) {
-    return [];
   }
 
   /// Shuffle Mode

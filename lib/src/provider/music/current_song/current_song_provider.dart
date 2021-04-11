@@ -69,7 +69,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
 final currentSongProvider = StateNotifierProvider((ref) => CurrentSongProvider());
 
 final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _globalContext = ref.read(globalContext).state;
   final _currentSongProvider = ref.read(currentSongProvider);
@@ -108,7 +108,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
 
 final previousSong = FutureProvider<MusicModel>((ref) async {
   final _globalContext = ref.read(globalContext).state;
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _currentSongProvider = ref.read(currentSongProvider);
   final _currentSong = ref.read(currentSongProvider.state);
@@ -165,30 +165,31 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
   final _globalContext = ref.read(globalContext).state;
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _currentSongProvider = ref.read(currentSongProvider);
   final _currentSong = ref.read(currentSongProvider.state);
   final _recentPlayProvider = ref.read(recentPlayProvider);
   final loopModeSetting = ref.read(settingProvider.state).loopMode;
 
-  final sharedParameter = SharedParameter();
-
-  final lastIndex = _musics.length - 1;
-  final currentIndex = _currentSong.currentIndex;
-
   try {
-    ///* Save Listen Song Duration Every Song
-    ref.read(setListenSong(_currentSong.song));
+    final lastIndex = _musics.length - 1;
+    final currentIndex = _currentSong.currentIndex;
 
+    final sharedParameter = SharedParameter();
+    var nextSong = MusicModel();
     var nextIndex = 0;
+
     if (_musics.length > 1) {
       /// Check if current index + 1 exceeds the last index
       /// if [true] play first index song
       /// else play next index song
       nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
     }
-    var nextSong = MusicModel();
+
+    ///* Save Listen Current Song Duration Every Song
+    ref.read(setListenSong(_currentSong.song));
+
     switch (loopModeSetting) {
       case LoopModeSetting.all:
         nextSong = _musics[nextIndex];
