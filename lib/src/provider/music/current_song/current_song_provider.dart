@@ -69,7 +69,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
 final currentSongProvider = StateNotifierProvider((ref) => CurrentSongProvider());
 
 final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
-  final _musics = ref.read(filteredMusic).state;
+  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _globalContext = ref.read(globalContext).state;
   final _currentSongProvider = ref.read(currentSongProvider);
@@ -85,7 +85,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
       showNotification: true,
       notificationSettings: sharedParameter.notificationSettings(
         _globalContext!,
-        musics: _musics,
+        musics: _filteredMusic,
       ),
     );
 
@@ -108,7 +108,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
 
 final previousSong = FutureProvider<MusicModel>((ref) async {
   final _globalContext = ref.read(globalContext).state;
-  final _musics = ref.read(filteredMusic).state;
+  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _currentSongProvider = ref.read(currentSongProvider);
   final _currentSong = ref.read(currentSongProvider.state);
@@ -116,7 +116,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 
   final sharedParameter = SharedParameter();
 
-  final lastIndex = _musics.length - 1;
+  final lastIndex = _filteredMusic.length - 1;
   final currentIndex = _currentSong.currentIndex;
 
   try {
@@ -124,14 +124,14 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
     ref.read(setListenSong(_currentSong.song));
 
     var nextIndex = 0;
-    if (_musics.length > 1) {
+    if (_filteredMusic.length > 1) {
       /// Check if current index - 1 is Negative
       /// if [true] play last index song
       /// else play previous index song
 
       nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
     }
-    final previousSong = _musics[nextIndex];
+    final previousSong = _filteredMusic[nextIndex];
 
     await _players.open(
       Audio.file(
@@ -141,7 +141,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
       showNotification: true,
       notificationSettings: sharedParameter.notificationSettings(
         _globalContext!,
-        musics: _musics,
+        musics: _filteredMusic,
       ),
     );
     _currentSongProvider._setInitSong(previousSong, index: nextIndex);
@@ -165,7 +165,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
   final _globalContext = ref.read(globalContext).state;
-  final _musics = ref.read(filteredMusic).state;
+  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _currentSongProvider = ref.read(currentSongProvider);
   final _currentSong = ref.read(currentSongProvider.state);
@@ -173,14 +173,14 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
   final loopModeSetting = ref.read(settingProvider.state).loopMode;
 
   try {
-    final lastIndex = _musics.length - 1;
+    final lastIndex = _filteredMusic.length - 1;
     final currentIndex = _currentSong.currentIndex;
 
     final sharedParameter = SharedParameter();
     var nextSong = MusicModel();
     var nextIndex = 0;
 
-    if (_musics.length > 1) {
+    if (_filteredMusic.length > 1) {
       /// Check if current index + 1 exceeds the last index
       /// if [true] play first index song
       /// else play next index song
@@ -192,27 +192,27 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 
     switch (loopModeSetting) {
       case LoopModeSetting.all:
-        nextSong = _musics[nextIndex];
+        nextSong = _filteredMusic[nextIndex];
 
         await _players.open(
           Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
-            musics: _musics,
+            musics: _filteredMusic,
           ),
         );
 
         _currentSongProvider._setInitSong(nextSong, index: nextIndex);
         break;
       case LoopModeSetting.single:
-        nextSong = _musics[currentIndex];
+        nextSong = _filteredMusic[currentIndex];
         await _players.open(
           Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
-            musics: _musics,
+            musics: _filteredMusic,
           ),
         );
 

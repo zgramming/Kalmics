@@ -114,11 +114,12 @@ final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {
 });
 final totalDurationFormat = StateProvider<String>((ref) {
   final _currentSong = ref.watch(currentSongProvider.state);
-  final _musics = ref.watch(musicProvider.state);
+  final _filteredMusic = ref.watch(filteredMusic).state;
 
   var totalDurationInMinute = 0;
-  String _totalRemainingSecond = '';
-  final totalDuration = _musics[_currentSong.currentIndex].songDuration;
+  var _totalRemainingSecond = '';
+
+  final totalDuration = _filteredMusic[_currentSong.currentIndex].songDuration;
   totalDurationInMinute = totalDuration.inMinutes;
   final totalRemainingSecond = (totalDuration.inSeconds) % 60;
   _totalRemainingSecond =
