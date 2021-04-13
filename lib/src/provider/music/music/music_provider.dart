@@ -75,32 +75,18 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
         if (item.idMusic == music.idMusic) item.copyWith(totalListenSong: newDuration) else item
     ];
   }
-
-  List<MusicModel> searchMusic(String query) {
-    final result = state
-        .where((element) => (element.title ?? '').toLowerCase().contains(query.toLowerCase()))
-        .toList();
-    if (result.isEmpty) {
-      return [];
-    }
-
-    if (query.isEmpty) {
-      return state;
-    }
-
-    return result;
-  }
-
-  Duration totalSongDuration() {
-    final totalSongDuration = state.fold<int>(0, (previousValue, currentValue) {
-      return previousValue + (currentValue.songDuration.inSeconds);
-    });
-
-    return Duration(seconds: totalSongDuration);
-  }
 }
 
 final musicProvider = StateNotifierProvider((ref) => MusicProvider());
+
+final totalSongDuration = StateProvider.autoDispose<Duration>((ref) {
+  final _musics = ref.watch(musicProvider.state);
+  final totalSongDuration = _musics.fold<int>(0, (previousValue, currentValue) {
+    return previousValue + (currentValue.songDuration.inSeconds);
+  });
+
+  return Duration(seconds: totalSongDuration);
+});
 
 final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {
   final musics = ref.watch(musicProvider.state);
@@ -112,23 +98,8 @@ final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {
 
   return result;
 });
-final totalDurationFormat = StateProvider<String>((ref) {
-  final _currentSong = ref.watch(currentSongProvider.state);
-  final _filteredMusic = ref.watch(filteredMusic).state;
 
-  var totalDurationInMinute = 0;
-  var _totalRemainingSecond = '';
-
-  final totalDuration = _filteredMusic[_currentSong.currentIndex].songDuration;
-  totalDurationInMinute = totalDuration.inMinutes;
-  final totalRemainingSecond = (totalDuration.inSeconds) % 60;
-  _totalRemainingSecond =
-      (totalRemainingSecond > 9) ? '$totalRemainingSecond' : '0$totalRemainingSecond';
-
-  return '$totalDurationInMinute.$_totalRemainingSecond';
-});
-
-final filteredMusic = StateProvider<List<MusicModel>>((ref) {
+final filteredMusic = StateProvider.autoDispose<List<MusicModel>>((ref) {
   final _searchQuery = ref.watch(searchQuery).state;
   final _musicProvider = ref.watch(musicProvider.state);
   final _settingProvider = ref.watch(settingProvider.state);
@@ -183,15 +154,10 @@ final filteredMusic = StateProvider<List<MusicModel>>((ref) {
     }
   }
 
-  /// Shuffle Mode
-  if (_settingProvider.isShuffle) {
-    final tempListShuffle = [...result]..shuffle();
-    return tempListShuffle;
-  }
   return result;
 });
 
-final totalMusic = StateProvider<int>((ref) {
+final totalMusic = StateProvider.autoDispose<int>((ref) {
   final _filteredMusic = ref.watch(filteredMusic).state;
   final _musicProvider = ref.watch(musicProvider.state);
 

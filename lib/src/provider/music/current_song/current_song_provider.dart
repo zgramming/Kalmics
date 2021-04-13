@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,24 +70,45 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
 
 final currentSongProvider = StateNotifierProvider((ref) => CurrentSongProvider());
 
+final totalCurrentSongDurationFormat = StateProvider.autoDispose<String>((ref) {
+  final _currentSong = ref.watch(currentSongProvider.state);
+  final _musics = ref.watch(musicProvider.state);
+  var totalDurationInMinute = 0;
+  var _totalRemainingSecond = '';
+
+  final totalDuration = _musics[_currentSong.currentIndex].songDuration;
+  totalDurationInMinute = totalDuration.inMinutes;
+  final totalRemainingSecond = (totalDuration.inSeconds) % 60;
+  _totalRemainingSecond =
+      (totalRemainingSecond > 9) ? '$totalRemainingSecond' : '0$totalRemainingSecond';
+
+  return '$totalDurationInMinute.$_totalRemainingSecond';
+});
+
 final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
-  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
   final _globalContext = ref.read(globalContext).state;
+
+  ///* Get All musics
+  final _musics = ref.read(musicProvider.state);
+
+  ///* Initialize Current Song
   final _currentSongProvider = ref.read(currentSongProvider);
+
+  ///* For Saving History Recents Play
   final _recentPlayProvider = ref.read(recentPlayProvider);
 
-  final sharedParameter = SharedParameter();
-
-  final music = map['music'] as MusicModel;
-  final currentIndex = map['index'] as int;
   try {
+    final sharedParameter = SharedParameter();
+
+    final music = map['music'] as MusicModel;
+    final currentIndex = map['index'] as int;
     await _players.open(
       Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
       showNotification: true,
       notificationSettings: sharedParameter.notificationSettings(
         _globalContext!,
-        musics: _filteredMusic,
+        musics: _musics,
       ),
     );
 
@@ -95,7 +118,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
     _recentPlayProvider.add(music);
   } on PlatformException catch (platformException) {
     var message = ConstString.defaultErrorPlayingSong;
-    if (platformException.code == 'OPEN') {
+    if (platformException.code == ConstString.codeErrorCantOpenSong) {
       message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
@@ -107,44 +130,89 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
 });
 
 final previousSong = FutureProvider<MusicModel>((ref) async {
-  final _globalContext = ref.read(globalContext).state;
-  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
+
+  final _globalContext = ref.read(globalContext).state;
+
+  ///* Get All Music
+  final _musics = ref.read(musicProvider.state);
+
+  ///* For Set/Initialize current song
   final _currentSongProvider = ref.read(currentSongProvider);
+
+  ///* Get Detail Current Song
   final _currentSong = ref.read(currentSongProvider.state);
+
+  ///* For Save history recents Play
   final _recentPlayProvider = ref.read(recentPlayProvider);
 
-  final sharedParameter = SharedParameter();
-
-  final lastIndex = _filteredMusic.length - 1;
-  final currentIndex = _currentSong.currentIndex;
+  ///* For get [Mode Loop , Mode Shuffle]
+  final _settingProvider = ref.read(settingProvider.state);
 
   try {
-    ///* Save Listen Song Duration Every Song
-    ref.read(setListenSong(_currentSong.song));
+    final loopModeSetting = _settingProvider.loopMode;
+    final isShuffle = _settingProvider.isShuffle;
 
-    var nextIndex = 0;
-    if (_filteredMusic.length > 1) {
+    final sharedParameter = SharedParameter();
+
+    var previousSong = MusicModel();
+    var previousIndex = 0;
+
+    final lastIndex = _musics.length - 1;
+    final currentIndex = _currentSong.currentIndex;
+
+    if (_musics.length > 1) {
       /// Check if current index - 1 is Negative
       /// if [true] play last index song
       /// else play previous index song
 
-      nextIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
-    }
-    final previousSong = _filteredMusic[nextIndex];
+      previousIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
 
-    await _players.open(
-      Audio.file(
-        previousSong.pathFile ?? '',
-        metas: sharedParameter.metas(previousSong),
-      ),
-      showNotification: true,
-      notificationSettings: sharedParameter.notificationSettings(
-        _globalContext!,
-        musics: _filteredMusic,
-      ),
-    );
-    _currentSongProvider._setInitSong(previousSong, index: nextIndex);
+      if (isShuffle) {
+        final randomIndex = Random().nextInt(_musics.length);
+        previousIndex = randomIndex;
+      }
+    }
+
+    ///* Save Listen Song Duration Every Song
+    ref.read(setListenSong(_currentSong.song));
+
+    switch (loopModeSetting) {
+      case LoopModeSetting.all:
+        previousSong = _musics[previousIndex];
+        await _players.open(
+          Audio.file(previousSong.pathFile!, metas: sharedParameter.metas(previousSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            _globalContext!,
+            musics: _musics,
+          ),
+        );
+        _currentSongProvider._setInitSong(previousSong, index: previousIndex);
+        break;
+      case LoopModeSetting.single:
+        previousSong = _musics[currentIndex];
+        await _players.open(
+          Audio.file(previousSong.pathFile!, metas: sharedParameter.metas(previousSong)),
+          showNotification: true,
+          notificationSettings: sharedParameter.notificationSettings(
+            _globalContext!,
+            musics: _musics,
+          ),
+        );
+        _currentSongProvider._setInitSong(
+          previousSong,
+          index: currentIndex,
+        );
+
+        break;
+      case LoopModeSetting.none:
+        previousSong = MusicModel();
+        await _players.stop();
+        _currentSongProvider.stopSong();
+        break;
+      default:
+    }
 
     ///* Save History Recents Play
     _recentPlayProvider.add(previousSong);
@@ -152,7 +220,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
     return previousSong;
   } on PlatformException catch (platformException) {
     var message = ConstString.defaultErrorPlayingSong;
-    if (platformException.code == 'OPEN') {
+    if (platformException.code == ConstString.codeErrorCantOpenSong) {
       message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
@@ -164,27 +232,46 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 });
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
-  final _globalContext = ref.read(globalContext).state;
-  final _filteredMusic = ref.read(filteredMusic).state;
   final _players = ref.read(globalAudioPlayers).state;
+  final _globalContext = ref.read(globalContext).state;
+
+  /// Get All Music
+  final _musics = ref.read(musicProvider.state);
+
+  ///* Set/Initialize Current Song
   final _currentSongProvider = ref.read(currentSongProvider);
+
+  ///* Get Detail Current Song
   final _currentSong = ref.read(currentSongProvider.state);
+
+  ///* For saving to history recents play
   final _recentPlayProvider = ref.read(recentPlayProvider);
-  final loopModeSetting = ref.read(settingProvider.state).loopMode;
+
+  ///* For get [Mode Loop , Mode Shuffle]
+  final _settingProvider = ref.read(settingProvider.state);
 
   try {
-    final lastIndex = _filteredMusic.length - 1;
-    final currentIndex = _currentSong.currentIndex;
+    final loopModeSetting = _settingProvider.loopMode;
+    final isShuffle = _settingProvider.isShuffle;
 
     final sharedParameter = SharedParameter();
+
     var nextSong = MusicModel();
     var nextIndex = 0;
 
-    if (_filteredMusic.length > 1) {
+    final lastIndex = _musics.length - 1;
+    final currentIndex = _currentSong.currentIndex;
+
+    if (_musics.length > 1) {
       /// Check if current index + 1 exceeds the last index
       /// if [true] play first index song
       /// else play next index song
       nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
+
+      if (isShuffle) {
+        final randomIndex = Random().nextInt(_musics.length);
+        nextIndex = randomIndex;
+      }
     }
 
     ///* Save Listen Current Song Duration Every Song
@@ -192,31 +279,39 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 
     switch (loopModeSetting) {
       case LoopModeSetting.all:
-        nextSong = _filteredMusic[nextIndex];
+        nextSong = _musics[nextIndex];
 
         await _players.open(
           Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
-            musics: _filteredMusic,
+            musics: _musics,
           ),
         );
 
-        _currentSongProvider._setInitSong(nextSong, index: nextIndex);
+        _currentSongProvider._setInitSong(
+          nextSong,
+          index: nextIndex,
+        );
+
         break;
       case LoopModeSetting.single:
-        nextSong = _filteredMusic[currentIndex];
+        nextSong = _musics[currentIndex];
+
         await _players.open(
-          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          Audio.file(nextSong.pathFile!, metas: sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
-            musics: _filteredMusic,
+            musics: _musics,
           ),
         );
 
-        _currentSongProvider._setInitSong(nextSong, index: currentIndex);
+        _currentSongProvider._setInitSong(
+          nextSong,
+          index: currentIndex,
+        );
         break;
       case LoopModeSetting.none:
         nextSong = MusicModel();
@@ -232,7 +327,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
     return nextSong;
   } on PlatformException catch (platformException) {
     var message = ConstString.defaultErrorPlayingSong;
-    if (platformException.code == 'OPEN') {
+    if (platformException.code == ConstString.codeErrorCantOpenSong) {
       message = ConstString.songNotFoundInDirectory;
     }
     _currentSongProvider.stopSong();
