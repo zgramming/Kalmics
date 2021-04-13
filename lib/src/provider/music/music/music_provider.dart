@@ -79,13 +79,28 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
 
 final musicProvider = StateNotifierProvider((ref) => MusicProvider());
 
-final totalSongDuration = StateProvider.autoDispose<Duration>((ref) {
+final totalMusicDuration = StateProvider.autoDispose<String>((ref) {
   final _musics = ref.watch(musicProvider.state);
   final totalSongDuration = _musics.fold<int>(0, (previousValue, currentValue) {
     return previousValue + (currentValue.songDuration.inSeconds);
   });
 
-  return Duration(seconds: totalSongDuration);
+  var result = '';
+
+  final _durationInHour = Duration(seconds: totalSongDuration).inHours,
+      _durationInMinute = Duration(seconds: totalSongDuration).inMinutes,
+      _durationInSecond = Duration(seconds: totalSongDuration).inSeconds;
+
+  if (_durationInHour > 0) {
+    final remainingMinute = _durationInMinute % 60;
+    result = '$_durationInHour Jam $remainingMinute Menit';
+  } else {
+    final remainingSecond = _durationInSecond % 60;
+    result = '$_durationInMinute Menit $remainingSecond Detik';
+  }
+
+  return result;
+  // return Duration(seconds: totalSongDuration);
 });
 
 final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {

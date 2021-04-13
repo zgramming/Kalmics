@@ -18,21 +18,35 @@ class MusicPlayerList extends StatelessWidget {
           builder: (context, watch, child) {
             final _currentSongProvider = watch(currentSongProvider.state);
             final _totalMusic = watch(totalMusic).state;
+            final _totalDurationMusic = watch(totalMusicDuration).state;
             final _filteredMusic = watch(filteredMusic).state;
-
+  
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Total Lagu : $_totalMusic ',
-                      textAlign: TextAlign.right,
-                      style: GoogleFonts.openSans(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Durasi Lagu : $_totalDurationMusic ',
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.openSans(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'Total Lagu : $_totalMusic ',
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.openSans(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   MusicPlayerItem(musics: _filteredMusic),
