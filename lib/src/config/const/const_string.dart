@@ -74,4 +74,7 @@ class ConstString {
   static const defaultErrorPlayingSong = 'Tidak dapat memainkan musik';
   static const songNotFoundInDirectory = 'Lagu tidak ditemukan di storage kamu';
   static const menuPopUpButtonNotValid = 'Pilihan tidak valid';
+
+  ///* Code Error
+  static const codeErrorCantOpenSong = 'OPEN';
 }
