@@ -11,15 +11,9 @@ class MusicPlayerDetailActionPrevious extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        final _globalAnimation = context.read(globalSizeAnimationController).state;
-        _globalAnimation?.reset();
-
-        Future.delayed(const Duration(milliseconds: 200), () {
-          context.refresh(previousSong);
-          _globalAnimation?.forward();
-        });
-      },
+      onTap: () => Future.delayed(const Duration(milliseconds: 200), () {
+        context.refresh(previousSong);
+      }),
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,

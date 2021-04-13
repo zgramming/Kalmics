@@ -12,22 +12,15 @@ class MusicPlayerDetailActionNext extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        final _globalAnimation = context.read(globalSizeAnimationController).state;
-        _globalAnimation?.reset();
-        Future.delayed(const Duration(milliseconds: 200), () {
-          context
-              .refresh(nextSong)
-              .then((value) => _globalAnimation?.forward())
-              .catchError((error) {
-            GlobalFunction.showSnackBar(
-              context,
-              content: Text(error.toString()),
-              snackBarType: SnackBarType.error,
-            );
-          });
+      onTap: () => Future.delayed(const Duration(milliseconds: 200), () {
+        context.refresh(nextSong).catchError((error) {
+          GlobalFunction.showSnackBar(
+            context,
+            content: Text(error.toString()),
+            snackBarType: SnackBarType.error,
+          );
         });
-      },
+      }),
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
