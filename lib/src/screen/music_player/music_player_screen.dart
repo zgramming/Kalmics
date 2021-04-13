@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -11,23 +9,11 @@ import './widgets/music_player_appbar.dart';
 import './widgets/music_player_floating_v1.dart';
 import './widgets/music_player_list.dart';
 
-class MusicPlayerScreen extends StatefulWidget {
+class MusicPlayerScreen extends StatelessWidget {
   static const routeNamed = '/music-player-screen';
 
   @override
-  _MusicPlayerScreenState createState() => _MusicPlayerScreenState();
-}
-
-class _MusicPlayerScreenState extends State<MusicPlayerScreen> with AutomaticKeepAliveClientMixin {
-  @override
-  void dispose() {
-    log('dispose on MusicPlayerScreen');
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       body: ProviderListener<StateController<bool>>(
         provider: isLoading,
@@ -41,7 +27,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with AutomaticKee
         child: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
-            context.read(globalSearch).state = false;
+            context.read(isModeSearch).state = false;
           },
           child: Container(
             decoration: BoxDecoration(
@@ -58,7 +44,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with AutomaticKee
                 const MusicPlayerAppBar(),
                 Consumer(
                   builder: (context, watch, child) {
-                    final isSearch = watch(globalSearch).state;
+                    final isSearch = watch(isModeSearch).state;
 
                     if (isSearch) {
                       return SizedBox.expand(
@@ -77,7 +63,4 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with AutomaticKee
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

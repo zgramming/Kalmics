@@ -4,6 +4,7 @@ import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../provider/my_provider.dart';
+
 import './music_player_item.dart';
 
 class MusicPlayerList extends StatelessWidget {

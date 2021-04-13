@@ -14,7 +14,7 @@ class MusicPlayerToggleSearch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, watch, child) {
-        final isSearch = watch(globalSearch).state;
+        final isSearch = watch(isModeSearch).state;
         if (isSearch) {
           return SizedBox(
             width: sizes.width(context) / 2,
@@ -25,7 +25,7 @@ class MusicPlayerToggleSearch extends StatelessWidget {
               controller: TextEditingController(text: context.read(searchQuery).state),
               textStyle: GoogleFonts.openSans(color: Colors.white),
               onFieldSubmitted: (value) {
-                context.read(globalSearch).state = false;
+                context.read(isModeSearch).state = false;
                 context.read(searchQuery).state = value;
               },
               onChanged: (value) {
@@ -37,7 +37,7 @@ class MusicPlayerToggleSearch extends StatelessWidget {
         return IconButton(
           icon: const Icon(Icons.search_rounded),
           tooltip: 'Cari lagu kesukaanmu',
-          onPressed: () => context.read(globalSearch).state = true,
+          onPressed: () => context.read(isModeSearch).state = true,
         );
       },
     );

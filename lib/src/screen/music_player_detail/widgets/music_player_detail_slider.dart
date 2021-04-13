@@ -68,7 +68,7 @@ class MusicPlayerDetailSlider extends StatelessWidget {
           ),
           Consumer(
             builder: (context, watch, child) {
-              final _totalDurationFormat = watch(totalDurationFormat).state;
+              final _totalDurationFormat = watch(totalCurrentSongDurationFormat).state;
               return Text(
                 _totalDurationFormat,
                 textAlign: TextAlign.center,
