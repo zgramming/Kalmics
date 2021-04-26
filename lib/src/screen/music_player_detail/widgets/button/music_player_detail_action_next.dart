@@ -11,24 +11,27 @@ class MusicPlayerDetailActionNext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Future.delayed(const Duration(milliseconds: 200), () {
-        context.refresh(nextSong).catchError((error) {
-          GlobalFunction.showSnackBar(
-            context,
-            content: Text(error.toString()),
-            snackBarType: SnackBarType.error,
-          );
-        });
-      }),
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
-        child: FittedBox(
-          child: Icon(
-            Icons.skip_next_rounded,
-            size: ConstSize.iconActionMusicPlayerDetail(context),
+    return Tooltip(
+      message: ConstString.toolTipNextSong,
+      child: InkWell(
+        onTap: () => Future.delayed(const Duration(milliseconds: 200), () {
+          context.refresh(nextSong).catchError((error) {
+            GlobalFunction.showSnackBar(
+              context,
+              content: Text(error.toString()),
+              snackBarType: SnackBarType.error,
+            );
+          });
+        }),
+        child: CircleAvatar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
+          child: FittedBox(
+            child: Icon(
+              Icons.skip_next_rounded,
+              size: ConstSize.iconActionMusicPlayerDetail(context),
+            ),
           ),
         ),
       ),

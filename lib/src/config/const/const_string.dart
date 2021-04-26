@@ -77,4 +77,16 @@ class ConstString {
 
   ///* Code Error
   static const codeErrorCantOpenSong = 'OPEN';
+
+  ///* Tooltip Message
+  static const toolTipShuffle = 'Memutar lagu secara acak';
+  static const toolTipPreviousSong = 'Lagu sebelumnya';
+  static const toolTipPlayAndPause = 'Memainkan / menghentikan lagu';
+  static const toolTipNextSong = 'Lagu berikutnya';
+  static const toolTipRepeatNone = 'Tidak ada pengulangan';
+  static const toolTipRepeatSingle = 'Pengulangan 1 lagu';
+  static const toolTipRepeatAll = 'Pengulangan semua lagu';
+  static const toolTipSendSong = 'Kirim lagu kepada temanmu';
+  static const toolTipInfoCountPlaySong = 'Informasi berapa banyak pemutaran lagu';
+  static const toolTipShowOffSong = 'Pamerkan lagu yang sedang dimainkan';
 }

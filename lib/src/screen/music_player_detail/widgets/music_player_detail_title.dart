@@ -5,7 +5,9 @@ import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share/share.dart';
 
+import '../../../config/my_config.dart';
 import '../../../provider/my_provider.dart';
+
 import './music_player_detail_info_total_playing.dart';
 import './music_player_detail_screenshot.dart';
 
@@ -55,66 +57,75 @@ class _MusicPlayerDetailTitleState extends State<MusicPlayerDetailTitle> {
                     spacing: 20,
                     alignment: WrapAlignment.center,
                     children: [
-                      InkWell(
-                        onTap: () async => Share.shareFiles(
-                          [_currentSong.song.pathFile ?? ''],
-                          text: _currentSong.song.title,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colorPallete.accentColor,
+                      Tooltip(
+                        message: ConstString.toolTipSendSong,
+                        child: InkWell(
+                          onTap: () async => Share.shareFiles(
+                            [_currentSong.song.pathFile ?? ''],
+                            text: _currentSong.song.title,
                           ),
-                          child: const Icon(
-                            Icons.share,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                              shape:
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              child: MusicPlayerDetailInfoTotalPlaying(
-                                idMusic: _currentSong.song.idMusic,
-                              ),
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: colorPallete.accentColor,
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colorPallete.accentColor,
-                          ),
-                          child: const Icon(
-                            Icons.info_outline_rounded,
-                            color: Colors.white,
+                            child: const Icon(
+                              Icons.share,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                      InkWell(
-                        onTap: () => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                      Tooltip(
+                        message: ConstString.toolTipInfoCountPlaySong,
+                        child: InkWell(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                shape:
+                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                child: MusicPlayerDetailInfoTotalPlaying(
+                                  idMusic: _currentSong.song.idMusic,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: colorPallete.accentColor,
+                            ),
+                            child: const Icon(
+                              Icons.info_outline_rounded,
+                              color: Colors.white,
+                            ),
                           ),
-                          builder: (context) => const MusicPlayerDetailScreenshot(),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: colorPallete.accentColor,
+                      ),
+                      Tooltip(
+                        message: ConstString.toolTipShowOffSong,
+                        child: InkWell(
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                            ),
+                            builder: (context) => const MusicPlayerDetailScreenshot(),
                           ),
-                          child: const Icon(
-                            Icons.camera_alt_rounded,
-                            color: Colors.white,
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: colorPallete.accentColor,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt_rounded,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

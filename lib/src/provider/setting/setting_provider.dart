@@ -146,32 +146,38 @@ final iconLoopMode = StateProvider.family<Widget, BuildContext>(
     final _settingProvider = ref.watch(settingProvider.state);
 
     IconData icon = Icons.loop;
+    var tooltip = ConstString.toolTipRepeatAll;
 
     switch (_settingProvider.loopMode) {
       case LoopModeSetting.none:
         icon = Icons.repeat;
+        tooltip = ConstString.toolTipRepeatNone;
         break;
       case LoopModeSetting.single:
         icon = Icons.repeat_one_rounded;
+        tooltip = ConstString.toolTipRepeatSingle;
         break;
       case LoopModeSetting.all:
         icon = Icons.repeat;
-        break;
-      default:
-        icon = Icons.repeat_one_rounded;
+        tooltip = ConstString.toolTipRepeatAll;
         break;
     }
+
     final color = _settingProvider.loopMode == LoopModeSetting.all
         ? colorPallete.accentColor!
         : Colors.transparent;
-    return CircleAvatar(
-      backgroundColor: color,
-      foregroundColor: Colors.white,
-      radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
-      child: FittedBox(
-        child: Icon(
-          icon,
-          size: ConstSize.iconActionMusicPlayerDetail(context),
+
+    return Tooltip(
+      message: tooltip,
+      child: CircleAvatar(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        radius: ConstSize.radiusIconActionMusicPlayerDetail(context),
+        child: FittedBox(
+          child: Icon(
+            icon,
+            size: ConstSize.iconActionMusicPlayerDetail(context),
+          ),
         ),
       ),
     );
