@@ -29,6 +29,8 @@ Simple application to play music on your storage
 - [x] Share song file
 - [x] Info how many songs have been played
 - [x] share the song you are listening to on social media
+- [x] Re-design dashboard
+
  
 ### Uncompleted
 - [ ] Multiple playlist
@@ -37,7 +39,6 @@ Simple application to play music on your storage
 - [ ] Show total duration listening each song
 - [ ] Set song as ringtone
 - [ ] Cut song
-- [ ] Re-design dashboard
 
 ## Preview Application
 
