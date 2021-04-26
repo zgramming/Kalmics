@@ -19,7 +19,7 @@ class HomePageViewRecentPlayState extends State<HomePageViewRecentPlay>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: sizes.height(context) / 2.5,
+      height: sizes.height(context) / 2.25,
       child: Consumer(
         builder: (context, watch, child) {
           final _future = watch(initRecentPlayList);

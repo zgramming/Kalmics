@@ -28,16 +28,17 @@ class MusicPlayerItem extends StatelessWidget {
         final result = musics[index];
         final artis = result.tag?.artist;
         final artwork = result.artwork;
-        final durationInMinute = result.songDuration.inMinutes;
-        final remainingSecond = (result.songDuration.inSeconds) % 60;
-        final _remainingSecond = (remainingSecond > 9) ? '$remainingSecond' : '0$remainingSecond';
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               onTap: () async {
-                final map = {'music': result, 'index': index};
+                final map = {
+                  'music': result,
+                  'index': index,
+                };
+
                 context.refresh(playSong(map)).then(
                   (_) {
                     context.read(searchQuery).state = '';
@@ -48,9 +49,9 @@ class MusicPlayerItem extends StatelessWidget {
                     );
                   },
                 ).catchError(
-                  (String error) => showDialog(
+                  (error) => showDialog(
                     context: context,
-                    builder: (context) => MusicPlayerErrorDialog(error: error),
+                    builder: (context) => MusicPlayerErrorDialog(error: error.toString()),
                   ),
                 );
               },
@@ -67,14 +68,20 @@ class MusicPlayerItem extends StatelessWidget {
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  '$durationInMinute.$_remainingSecond | ${(artis?.isNotEmpty ?? false) ? artis : 'Unknown Artist'}',
-                  maxLines: 1,
-                  style: GoogleFonts.openSans(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 10,
-                  ),
+                child: Consumer(
+                  builder: (context, watch, child) {
+                    final _formatDuration = watch(formatEachDurationSong(result.idMusic)).state;
+
+                    return Text(
+                      '$_formatDuration | ${(artis?.isNotEmpty ?? false) ? artis : 'Unknown Artist'}',
+                      maxLines: 1,
+                      style: GoogleFonts.openSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 10,
+                      ),
+                    );
+                  },
                 ),
               ),
               trailing: MusicPlayerItemTrailing(result: result),

@@ -38,7 +38,7 @@ class MusicPlayerScreen extends StatelessWidget {
           child: Consumer(
             builder: (_, watch, __) {
               final _totalMusic = watch(totalMusic).state;
-              final _totalDurationMusic = watch(totalMusicDuration).state;
+              final _totalDurationMusic = watch(formatTotalDurationSong).state;
               final _counterTimer = watch(globalWidgetCounterTimer).state;
 
               return Padding(

@@ -5,6 +5,7 @@ import 'package:global_template/global_template.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import './src/app.dart';
 import './src/network/my_network.dart';
@@ -23,6 +24,7 @@ class DurationAdapter extends TypeAdapter<Duration> {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  timeago.setLocaleMessages('id', timeago.IdMessages());
   initializeDateFormatting();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   appConfig.configuration(nameLogoAsset: 'Kalmics.png');

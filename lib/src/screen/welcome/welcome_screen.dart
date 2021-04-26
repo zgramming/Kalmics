@@ -24,7 +24,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      context.refresh(initListMusic);
       context.read(globalContext).state = context;
 
       SharedFunction.initWatcher(context);
@@ -45,15 +44,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return WillPopScope(
       onWillPop: () => SharedFunction.onBackButtonPressed(context),
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: ConstColor.backgroundColorGradient(),
-            ),
-          ),
-          child: IndexedStack(index: _selectedIndex, children: screens),
+        body: Consumer(
+          builder: (context, watch, child) {
+            final _initMusics = watch(initListMusic);
+            return _initMusics.when(
+              data: (_) => Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: ConstColor.backgroundColorGradient(),
+                  ),
+                ),
+                child: IndexedStack(index: _selectedIndex, children: screens),
+              ),
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, stackTrace) => Center(
+                child: Text(error.toString()),
+              ),
+            );
+          },
         ),
         floatingActionButton: InkWell(
           onTap: () => Navigator.of(context).pushNamed(MusicPlayerScreen.routeNamed),

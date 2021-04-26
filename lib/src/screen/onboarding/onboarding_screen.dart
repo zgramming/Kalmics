@@ -32,43 +32,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
             end: Alignment.bottomRight,
             colors: ConstColor.backgroundColorGradient(),
           ),
-          onPageChanged: (index) {},
-          onClickNext: (index) {},
-          onClickFinish: () async {
-            final permissionStorage = await Permission.storage.status;
-            if (permissionStorage != PermissionStatus.granted) {
-              final result = await Permission.storage.request();
-
-              if (result == PermissionStatus.permanentlyDenied) {
-                GlobalFunction.showDialogNeedAccess(
-                  context,
-                  onPressed: () async {
-                    final result = await openAppSettings();
-                    if (!result) {
-                      GlobalFunction.showSnackBar(
-                        context,
-                        content: const Text('Tidak dapat membuka setting'),
-                        snackBarType: SnackBarType.error,
-                      );
-                    }
-                  },
-                );
-              }
-              return;
-            }
-            context.read(isLoading).state = true;
-            context.refresh(initializeMusicFromStorage).then((_) async {
-              context.read(isLoading).state = false;
-              await context
-                  .read(settingProvider)
-                  .setSettingOnboardingScreen(value: ConstString.finishedOnboarding);
-              Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed);
-            }).catchError((error) {
-              context.read(isLoading).state = false;
-              GlobalFunction.showSnackBar(context,
-                  content: Text(error.toString()), snackBarType: SnackBarType.error);
-            });
-          },
           items: [
             OnboardingItem(
               logo: Align(
@@ -113,6 +76,48 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
               ),
             ),
           ],
+          onPageChanged: (index) {},
+          onClickNext: (index) {},
+          onClickFinish: () async {
+            final permissionStorage = await Permission.storage.status;
+            if (permissionStorage != PermissionStatus.granted) {
+              final result = await Permission.storage.request();
+
+              if (result == PermissionStatus.permanentlyDenied) {
+                GlobalFunction.showDialogNeedAccess(
+                  context,
+                  onPressed: () async {
+                    final result = await openAppSettings();
+                    if (!result) {
+                      GlobalFunction.showSnackBar(
+                        context,
+                        content: const Text('Tidak dapat membuka setting'),
+                        snackBarType: SnackBarType.error,
+                      );
+                    }
+                  },
+                );
+              }
+              return;
+            }
+            context.read(isLoading).state = true;
+            await Future.wait([
+              context.refresh(initializeMusicFromStorage),
+              context.refresh(initListMusic),
+              context
+                  .read(settingProvider)
+                  .setSettingOnboardingScreen(value: ConstString.finishedOnboarding),
+            ]).then((value) {
+              Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed);
+            }).catchError((error) {
+              context.read(isLoading).state = false;
+              GlobalFunction.showSnackBar(
+                context,
+                content: Text(error.toString()),
+                snackBarType: SnackBarType.error,
+              );
+            });
+          },
         ),
       ),
     );

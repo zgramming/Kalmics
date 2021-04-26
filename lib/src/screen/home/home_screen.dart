@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 
 import '../../provider/my_provider.dart';
+
 import './widget/home_floating_player.dart';
-import './widget/home_line_chart.dart';
+import './widget/home_header.dart';
+// import './widget/home_line_chart.dart';
 import './widget/home_pageview_recent_play.dart';
 import './widget/home_top_playlist.dart';
 
@@ -30,12 +32,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  HomeLineChart(),
+                  // HomeLineChart(),
+                  const HomeHeader(),
                   const SizedBox(height: 20),
-                  const HomeTopPlaylist(),
                   Divider(color: Colors.white.withOpacity(.5)),
                   const SizedBox(height: 20),
                   HomePageViewRecentPlay(),
+                  const SizedBox(height: 20),
+                  Divider(color: Colors.white.withOpacity(.5)),
+                  const SizedBox(height: 20),
+                  const HomeTopPlaylist(),
+                  Divider(color: Colors.white.withOpacity(.5)),
                   const SizedBox(height: 20),
                   Consumer(
                     builder: (_, watch, __) {

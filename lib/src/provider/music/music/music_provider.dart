@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -78,7 +79,90 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
 
 final musicProvider = StateNotifierProvider((ref) => MusicProvider());
 
-final totalMusicDuration = StateProvider.autoDispose<String>((ref) {
+final longestListenSong = StateProvider.autoDispose<MusicModel>((ref) {
+  final musics = ref.watch(musicProvider.state);
+  final durationListenNotZero =
+      musics.where((element) => element.totalListenSong.inSeconds > 0).toList();
+
+  if (durationListenNotZero.isEmpty) {
+    return MusicModel();
+  }
+  log('Trigger Longest Listen Song');
+  return durationListenNotZero.reduce((curr, next) =>
+      curr.totalListenSong.inSeconds > next.totalListenSong.inSeconds ? curr : next);
+});
+
+final formatLongestListenEachSong =
+    StateProvider.autoDispose.family<String, String>((ref, idMusic) {
+  final _musicByID = ref.watch(musicById(idMusic)).state;
+
+  final durations = _musicByID.totalListenSong.inSeconds;
+
+  var result = '';
+
+  final _durationInHour = Duration(seconds: durations).inHours,
+      _durationInMinute = Duration(seconds: durations).inMinutes,
+      _durationInSecond = Duration(seconds: durations).inSeconds;
+
+  if (_durationInHour > 0) {
+    final remainingMinute = _durationInMinute % 60;
+    result = '$_durationInHour Jam $remainingMinute Menit';
+  } else {
+    final remainingSecond = _durationInSecond % 60;
+    result = '$_durationInMinute Menit $remainingSecond Detik';
+  }
+
+  return result;
+});
+
+final formatTotalDurationListenSong = StateProvider.autoDispose<String>((ref) {
+  final _musics = ref.watch(musicProvider.state);
+  final totalDurations = _musics.fold<int>(
+      0, (previousValue, element) => previousValue + (element.totalListenSong.inSeconds));
+
+  if (totalDurations <= 0) {
+    return 'Data tidak cukup';
+  }
+
+  var result = '';
+
+  final _durationInHour = Duration(seconds: totalDurations).inHours,
+      _durationInMinute = Duration(seconds: totalDurations).inMinutes,
+      _durationInSecond = Duration(seconds: totalDurations).inSeconds;
+
+  if (_durationInHour > 0) {
+    final remainingMinute = _durationInMinute % 60;
+    result = '$_durationInHour Jam $remainingMinute Menit';
+  } else {
+    final remainingSecond = _durationInSecond % 60;
+    result = '$_durationInMinute Menit $remainingSecond Detik';
+  }
+
+  return result;
+});
+
+final formatEachDurationSong = StateProvider.autoDispose.family<String, String>((ref, idMusic) {
+  final _musicByID = ref.watch(musicById(idMusic)).state;
+  final durations = _musicByID.songDuration.inSeconds;
+
+  var result = '';
+
+  final _durationInHour = Duration(seconds: durations).inHours,
+      _durationInMinute = Duration(seconds: durations).inMinutes,
+      _durationInSecond = Duration(seconds: durations).inSeconds;
+
+  if (_durationInHour > 0) {
+    final remainingMinute = _durationInMinute % 60;
+    result = '$_durationInHour Jam $remainingMinute Menit';
+  } else {
+    final remainingSecond = _durationInSecond % 60;
+    result = '$_durationInMinute Menit $remainingSecond Detik';
+  }
+
+  return result;
+});
+
+final formatTotalDurationSong = StateProvider.autoDispose<String>((ref) {
   final _musics = ref.watch(musicProvider.state);
   final _filteredMusic = ref.watch(filteredMusic).state;
   final _searchQuery = ref.watch(searchQuery).state;
@@ -279,7 +363,7 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
 });
 
 final setListenSong = FutureProvider.family<void, MusicModel>((ref, music) async {
-  final currentSongDuration = ref.read(currentSongProvider.state).currentDuration;
+  final currentSongDuration = ref.watch(currentSongProvider.state).currentDuration;
   final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
 
   final calculateTotalDuration = music.totalListenSong.inSeconds + currentSongDuration.inSeconds;
@@ -288,7 +372,7 @@ final setListenSong = FutureProvider.family<void, MusicModel>((ref, music) async
     music.copyWith(totalListenSong: Duration(seconds: calculateTotalDuration)),
   );
 
-  ref.read(musicProvider)._setListenSong(music, Duration(seconds: calculateTotalDuration));
+  ref.watch(musicProvider)._setListenSong(music, Duration(seconds: calculateTotalDuration));
 });
 
 final editSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {

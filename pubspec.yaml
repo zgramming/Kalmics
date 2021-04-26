@@ -41,6 +41,7 @@ dependencies:
   path_provider: ^2.0.1
   permission_handler: ^7.0.0
   share: ^2.0.1
+  timeago: ^3.0.2
   url_launcher: ^6.0.3
   uuid: ^3.0.4
   watcher: ^1.0.0
@@ -72,6 +73,7 @@ flutter:
     - assets/images/gummy-ipod.png
     - assets/images/icons8.png
     - assets/images/error.png
+    - assets/images/crown.png
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

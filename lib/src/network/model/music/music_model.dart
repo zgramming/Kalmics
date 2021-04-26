@@ -33,6 +33,7 @@ class MusicModel extends HiveObject with EquatableMixin {
     this.songDuration = Duration.zero,
     this.totalListenSong = Duration.zero,
   });
+
   @override
   List get props {
     return [
