@@ -39,7 +39,7 @@ class MusicPlayerScreen extends StatelessWidget {
             builder: (_, watch, __) {
               final _totalMusic = watch(totalMusic).state;
               final _totalDurationMusic = watch(totalMusicDuration).state;
-              final _counterTimer = watch(globalCounterTimer).state;
+              final _counterTimer = watch(globalWidgetCounterTimer).state;
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),

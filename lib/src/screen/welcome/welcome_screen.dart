@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,22 +18,15 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final sharedParameter = SharedParameter();
-
+  final List<Widget> screens = [HomeScreen(), SettingScreen()];
   int _selectedIndex = 0;
-
-  final List<Widget> screens = [
-    HomeScreen(),
-    SettingScreen(),
-  ];
-
-  Timer? timer;
 
   @override
   void initState() {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      context.read(globalContext).state = context;
       context.refresh(initListMusic);
+      context.read(globalContext).state = context;
+
       SharedFunction.initWatcher(context);
       SharedFunction.initAudioPlayers(context);
     });

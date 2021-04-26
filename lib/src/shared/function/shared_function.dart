@@ -228,7 +228,11 @@ class SharedFunction {
   }
 
   static Future<void> timerPMB(BuildContext context) async {
-    context.read(globalCounterTimer).state = null;
+    context.read(globalWidgetCounterTimer).state = null;
+
+    if (context.read(globalTimer).state?.isActive ?? false) {
+      context.read(globalTimer).state?.cancel();
+    }
 
     var messageSnackbar = '';
     var snackbarType = SnackBarType.normal;
@@ -275,28 +279,39 @@ class SharedFunction {
       messageSnackbar = ConstString.messageTimerGo;
       snackbarType = SnackBarType.success;
 
-      Timer.periodic(
+      final _timer = Timer.periodic(
         const Duration(seconds: 1),
         (timer) {
           log('Tick: ${timer.tick}\nTimerGo: ${timerGo.inSeconds}');
           if (timer.tick >= timerGo.inSeconds) {
-            GlobalFunction.showSnackBar(
-              context,
-              content: const Text(ConstString.messageTimerEnd),
-              snackBarType: SnackBarType.info,
-            );
-            timer.cancel();
+            ///* Stop Song
             context
                 .read(globalAudioPlayers)
                 .state
                 .stop()
                 .then((_) => context.read(currentSongProvider).stopSong());
-            context.read(globalCounterTimer).state = null;
+
+            ///* Stop Timer
+            timer.cancel();
+
+            ///* Reset Widget Counter Timer
+            context.read(globalWidgetCounterTimer).state = null;
+
+            ///* Show message if timer is end
+            GlobalFunction.showSnackBar(
+              context,
+              content: const Text(ConstString.messageTimerEnd),
+              snackBarType: SnackBarType.info,
+            );
           }
         },
       );
 
-      context.read(globalCounterTimer).state = TweenAnimationBuilder<Duration>(
+      ///* Initialize Global Timer
+      context.read(globalTimer).state = _timer;
+
+      ///* Initialize Widget Counter Timer
+      context.read(globalWidgetCounterTimer).state = TweenAnimationBuilder<Duration>(
         tween: Tween(begin: timerGo, end: Duration.zero),
         duration: timerGo,
         onEnd: () => log('Selesai Timer'),
@@ -318,6 +333,9 @@ class SharedFunction {
         },
       );
     }
+
+    ///* Show message depend condition
+
     GlobalFunction.showSnackBar(
       context,
       content: Text(messageSnackbar),

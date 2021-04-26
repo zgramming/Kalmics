@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
@@ -25,8 +26,11 @@ final isModeSearch = StateProvider.autoDispose<bool>((ref) => false);
 final searchQuery = StateProvider.autoDispose<String>((ref) => '');
 
 /// Widget Timer
-final globalCounterTimer =
+final globalWidgetCounterTimer =
     StateProvider.autoDispose<TweenAnimationBuilder<Duration>?>((ref) => null);
+
+/// Global Timer
+final globalTimer = StateProvider<Timer?>((ref) => null);
 
 /// Global file artwork, this usefull for update artwork
 /// When pick from storage / camera
