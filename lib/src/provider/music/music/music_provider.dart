@@ -25,7 +25,7 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
   Future<void> _addListMusic(List<MusicModel> musics) async {
     final musicBox = Hive.box<MusicModel>(musicBoxKey);
 
-    /// Always truncate music database if sync is fired
+    ///* Always truncate music database if sync is fired
     await musicBox.deleteAll(musicBox.keys);
 
     for (final MusicModel music in musics) {
@@ -216,27 +216,27 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
   final tagger = Audiotagger();
   final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
 
-  /// Filter only file with extension [.mp3] & Exclude [Constring.excludePathFile]
+  ///* Filter only file with extension [.mp3] & Exclude [Constring.excludePathFile]
   if (path.endsWith('.mp3') && !path.toLowerCase().contains(ConstString.excludePathFile)) {
-    /// get information meta from [.mp3]
+    ///* get information meta from [.mp3]
     final readTag = await tagger.readTags(path: path);
 
     final tagMetaData = TagMetaDataModel(
-      album: readTag.album,
-      albumArtist: readTag.albumArtist,
-      artist: readTag.artist,
-      artwork: readTag.artwork,
-      comment: readTag.comment,
-      discNumber: readTag.discNumber,
-      discTotal: readTag.discTotal,
-      genre: readTag.genre,
-      lyrics: readTag.lyrics,
-      title: readTag.title,
-      trackNumber: readTag.trackNumber,
-      trackTotal: readTag.trackTotal,
+      album: readTag?.album,
+      albumArtist: readTag?.albumArtist,
+      artist: readTag?.artist,
+      artwork: readTag?.artwork,
+      comment: readTag?.comment,
+      discNumber: readTag?.discNumber,
+      discTotal: readTag?.discTotal,
+      genre: readTag?.genre,
+      lyrics: readTag?.lyrics,
+      title: readTag?.title,
+      trackNumber: readTag?.trackNumber,
+      trackTotal: readTag?.trackTotal,
     );
 
-    /// get artwork/image from [.mp3]
+    ///* get artwork/image from [.mp3]
     final artwork = await tagger.readArtwork(path: path);
 
     final isExists = musics.firstWhere(
@@ -250,7 +250,7 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
       final _result = await players.current.first;
 
       final title =
-          (readTag.title?.isNotEmpty ?? false) ? readTag.title : basenameWithoutExtension(path);
+          (readTag?.title?.isNotEmpty ?? false) ? readTag?.title : basenameWithoutExtension(path);
 
       final music = MusicModel(
         idMusic: uuid.v1(),
@@ -332,56 +332,54 @@ final editArtworkSong = FutureProvider.family<void, MusicModel>((ref, music) asy
 
 final initializeMusicFromStorage = FutureProvider.autoDispose<void>((ref) async {
   final _musicProvider = ref.watch(musicProvider);
-  final players = AssetsAudioPlayer.withId(ConstString.idAssetAudioPlayer);
   final tagger = Audiotagger();
 
-  /// Folder to find music for platform [android], Not yet support for IOS
+  ///* Folder to find music for platform [android], Not yet support for IOS
   Directory dir = Directory('');
   if (Platform.isAndroid) {
     dir = Directory(ConstString.internalPathStorageAndroid);
   } else {
-    /// This line for another Platform [IOS/WINDOWS/LINUX/etc...]
+    ///* This line for another Platform [IOS/WINDOWS/LINUX/etc...]
   }
 
   List<FileSystemEntity> _files;
 
-  /// Search music folder with path directory[dir] declare before
+  ///* Search music folder with path directory[dir] declare before
   _files = dir.listSync(recursive: true, followLinks: false);
 
   final tempList = <MusicModel>[];
   for (final FileSystemEntity file in _files) {
-    /// Filter only file with extension [.mp3] & Exclude [Constring.excludePathFile]
+    ///* Filter only file with extension [.mp3] & Exclude [Constring.excludePathFile]
 
     if (file.path.endsWith('.mp3') &&
         !file.path.toLowerCase().contains(ConstString.excludePathFile)) {
       const uuid = Uuid();
 
       final path = file.path;
-      await players.open(Audio.file(path), autoStart: false);
-      final songDuration = (await players.current.first)!.audio.duration;
+      final songDuration = Duration(seconds: (await tagger.readAudioFile(path: path))?.length ?? 0);
 
-      /// get information meta from [.mp3]
+      ///* get information meta from [.mp3]
       final readTag = await tagger.readTags(path: path);
       final tagMetaData = TagMetaDataModel(
-        album: readTag.album,
-        albumArtist: readTag.albumArtist,
-        artist: readTag.artist,
-        artwork: readTag.artwork,
-        comment: readTag.comment,
-        discNumber: readTag.discNumber,
-        discTotal: readTag.discTotal,
-        genre: readTag.genre,
-        lyrics: readTag.lyrics,
-        title: readTag.title,
-        trackNumber: readTag.trackNumber,
-        trackTotal: readTag.trackTotal,
+        album: readTag?.album,
+        albumArtist: readTag?.albumArtist,
+        artist: readTag?.artist,
+        artwork: readTag?.artwork,
+        comment: readTag?.comment,
+        discNumber: readTag?.discNumber,
+        discTotal: readTag?.discTotal,
+        genre: readTag?.genre,
+        lyrics: readTag?.lyrics,
+        title: readTag?.title,
+        trackNumber: readTag?.trackNumber,
+        trackTotal: readTag?.trackTotal,
       );
 
-      /// get artwork/image from [.mp3]
+      ///* get artwork/image from [.mp3]
       final artwork = await tagger.readArtwork(path: path);
 
       final title =
-          (readTag.title?.isNotEmpty ?? false) ? readTag.title : basenameWithoutExtension(path);
+          (readTag?.title?.isNotEmpty ?? false) ? readTag?.title : basenameWithoutExtension(path);
 
       final music = MusicModel(
         idMusic: uuid.v1(),
@@ -392,7 +390,7 @@ final initializeMusicFromStorage = FutureProvider.autoDispose<void>((ref) async 
         songDuration: songDuration,
       );
 
-      /// For Music Playing
+      ///* For Music Playing
       tempList.add(music);
     }
   }
