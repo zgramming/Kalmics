@@ -67,13 +67,7 @@ class SharedFunction {
     });
   }
 
-  static void initAudioPlayers(
-    BuildContext context, {
-    required Timer? timer,
-  }) {
-    // initialize [global_timer]
-    context.read(globalTimer).state = timer;
-
+  static void initAudioPlayers(BuildContext context) {
     final players = context.read(globalAudioPlayers).state;
 
     players.currentPosition.listen((currentDuration) {
@@ -231,5 +225,103 @@ class SharedFunction {
         snackBarType: SnackBarType.error,
       );
     }
+  }
+
+  static Future<void> timerPMB(BuildContext context) async {
+    context.read(globalCounterTimer).state = null;
+
+    var messageSnackbar = '';
+    var snackbarType = SnackBarType.normal;
+
+    final timerPicker = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    var timerGo = Duration.zero;
+    int result = 0;
+
+    final now = DateTime.now();
+
+    final timerPickerDuration = Duration(
+      hours: timerPicker?.hour ?? 0,
+      minutes: timerPicker?.minute ?? 0,
+    ).inSeconds;
+
+    final nowDuration = Duration(hours: now.hour, minutes: now.minute).inSeconds;
+
+    if (timerPicker == null) {
+      messageSnackbar = ConstString.messageCancelTimer;
+    }
+
+    if (timerPickerDuration == nowDuration) {
+      messageSnackbar = ConstString.messageTimerIsEqualNow;
+      snackbarType = SnackBarType.warning;
+    }
+
+    if (timerPicker != null && timerPickerDuration != nowDuration) {
+      if (timerPickerDuration < nowDuration) {
+        result = (const Duration(days: 1).inSeconds) - (nowDuration - timerPickerDuration);
+        log('Kurang | ${const Duration(days: 1).inSeconds + nowDuration} - $timerPickerDuration = $result');
+      }
+
+      if (timerPickerDuration > nowDuration) {
+        result = timerPickerDuration - nowDuration;
+        log('jalankan timer || $timerPickerDuration - $nowDuration = ${timerPickerDuration - nowDuration}');
+      }
+
+      timerGo = Duration(seconds: result);
+
+      messageSnackbar = ConstString.messageTimerGo;
+      snackbarType = SnackBarType.success;
+
+      Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) {
+          log('Tick: ${timer.tick}\nTimerGo: ${timerGo.inSeconds}');
+          if (timer.tick >= timerGo.inSeconds) {
+            GlobalFunction.showSnackBar(
+              context,
+              content: const Text(ConstString.messageTimerEnd),
+              snackBarType: SnackBarType.info,
+            );
+            timer.cancel();
+            context
+                .read(globalAudioPlayers)
+                .state
+                .stop()
+                .then((_) => context.read(currentSongProvider).stopSong());
+            context.read(globalCounterTimer).state = null;
+          }
+        },
+      );
+
+      context.read(globalCounterTimer).state = TweenAnimationBuilder<Duration>(
+        tween: Tween(begin: timerGo, end: Duration.zero),
+        duration: timerGo,
+        onEnd: () => log('Selesai Timer'),
+        builder: (context, value, child) {
+          final hours = value.inHours;
+          var minutes = value.inMinutes;
+          var seconds = value.inSeconds % 60;
+          Widget result;
+          if (hours > 0) {
+            minutes = value.inMinutes % 60;
+            seconds = value.inSeconds % 60;
+            result = Text('$hours:$minutes:$seconds',
+                style: const TextStyle(fontSize: 10, color: Colors.white));
+          } else {
+            result = Text('$minutes:$seconds',
+                style: const TextStyle(fontSize: 12, color: Colors.white));
+          }
+          return result;
+        },
+      );
+    }
+    GlobalFunction.showSnackBar(
+      context,
+      content: Text(messageSnackbar),
+      snackBarType: snackbarType,
+    );
   }
 }

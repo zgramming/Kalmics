@@ -1,6 +1,9 @@
 import 'package:flutter/services.dart';
 
 class ConstString {
+  ///* Name Application
+  static const String applicationName = 'Kalmics';
+
   ///* Internal Storage platform android
   static const String internalPathStorageAndroid = '/storage/emulated/0/';
   static const String excludePathFile = '/android/data/';
@@ -74,6 +77,7 @@ class ConstString {
   static const defaultErrorPlayingSong = 'Tidak dapat memainkan musik';
   static const songNotFoundInDirectory = 'Lagu tidak ditemukan di storage kamu';
   static const menuPopUpButtonNotValid = 'Pilihan tidak valid';
+  static const failedRemoveSong = 'Gagal menghapus lagu dari aplikasi';
 
   ///* Code Error
   static const codeErrorCantOpenSong = 'OPEN';
@@ -89,4 +93,10 @@ class ConstString {
   static const toolTipSendSong = 'Kirim lagu kepada temanmu';
   static const toolTipInfoCountPlaySong = 'Informasi berapa banyak pemutaran lagu';
   static const toolTipShowOffSong = 'Pamerkan lagu yang sedang dimainkan';
+
+  ///* Timer Message
+  static const messageCancelTimer = 'Timer dibatalkan';
+  static const messageTimerIsEqualNow = 'Timer tidak boleh sama dengan waktu sekarang';
+  static const messageTimerGo = 'Timer dijalankan';
+  static const messageTimerEnd = 'Timer telah berakhir';
 }

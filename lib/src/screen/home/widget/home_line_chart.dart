@@ -136,7 +136,6 @@ class _HomeLineChartState extends State<HomeLineChart> {
             Colors.purple,
           ],
           barWidth: 2,
-
           // isStrokeCapRound: true,
           dotData: FlDotData(
             show: true,

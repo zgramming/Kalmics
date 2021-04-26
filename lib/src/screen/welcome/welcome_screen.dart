@@ -37,7 +37,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       context.read(globalContext).state = context;
       context.refresh(initListMusic);
       SharedFunction.initWatcher(context);
-      SharedFunction.initAudioPlayers(context, timer: timer);
+      SharedFunction.initAudioPlayers(context);
     });
 
     super.initState();
@@ -45,9 +45,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   void dispose() {
-    context.read(globalTimer).state?.cancel();
     context.read(globalAudioPlayers).state.dispose();
-
     super.dispose();
   }
 

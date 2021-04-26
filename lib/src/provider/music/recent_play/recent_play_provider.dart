@@ -47,8 +47,6 @@ final initRecentPlayList = FutureProvider<List<RecentPlayModel>>((ref) async {
   final _recentPlayProvider = ref.watch(recentPlayProvider);
   final boxs = Hive.box<RecentPlayModel>(RecentPlayProvider.recentPlayBoxKey).values.toList();
 
-  // if (boxs.isNotEmpty) {
-  // }
   _recentPlayProvider._init(boxs);
 
   return boxs;
@@ -62,9 +60,11 @@ final recentsPlayList = StateProvider<List<RecentPlayModel>>((ref) {
   ///* Sorting song by create_date
   tempList.sort((a, b) => (b.createDate!).compareTo(a.createDate!));
 
-  ///* Remove duplicate title song
-  ///
-  ///* It for case if you play multiple same song, and want distinct it
+  /**
+   * Remove duplicate title song
+   * It for case if you play multiple same song, and want distinct it
+   */
+
   final distinct = tempList.map((e) => e.music.title).toSet();
   tempList.retainWhere((element) => distinct.remove(element.music.title));
 
@@ -93,14 +93,9 @@ final recentsPlayLineChart = StateProvider<List<FlSpot>>((ref) {
   for (int i = 1; i <= 12; i++) {
     final totalPlaySong = _recentsPlay
         .where((element) {
-          final dateFromDatabase = DateTime(
-            element.createDate!.year,
-            element.createDate!.month,
-          );
-          final dateSearching = DateTime(
-            DateTime.now().year,
-            i,
-          );
+          final dateFromDatabase = DateTime(element.createDate!.year, element.createDate!.month);
+          final dateSearching = DateTime(DateTime.now().year, i);
+
           return dateFromDatabase == dateSearching;
         })
         .toList()

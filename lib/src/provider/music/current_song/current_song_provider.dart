@@ -162,9 +162,12 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
     final currentIndex = _currentSong.currentIndex;
 
     if (_musics.length > 1) {
-      /// Check if current index - 1 is Negative
-      /// if [true] play last index song
-      /// else play previous index song
+      /**
+       * Check if current index - 1 is Negative
+       * if [true] play last index song
+       * else play previous index song
+       * 
+       */
 
       previousIndex = (currentIndex - 1 < 0) ? lastIndex : currentIndex - 1;
 
@@ -235,7 +238,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
   final _players = ref.read(globalAudioPlayers).state;
   final _globalContext = ref.read(globalContext).state;
 
-  /// Get All Music
+  ///* Get All Music
   final _musics = ref.read(musicProvider.state);
 
   ///* Set/Initialize Current Song
@@ -263,9 +266,13 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
     final currentIndex = _currentSong.currentIndex;
 
     if (_musics.length > 1) {
-      /// Check if current index + 1 exceeds the last index
-      /// if [true] play first index song
-      /// else play next index song
+      /**
+       * Check if current index + 1 exceeds the last index
+       * if [true] play first index song
+       * else play next index song
+       * 
+       */
+
       nextIndex = (currentIndex + 1 > lastIndex) ? 0 : currentIndex + 1;
 
       if (isShuffle) {
