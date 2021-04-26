@@ -52,6 +52,9 @@ class ConstString {
   static const copyrightPermission = 'Copyright Icon';
   static const lastSongPlayed = 'LAGU TERAKHIR DIPUTAR';
   static const mostSongPlayed = 'PALING BANYAK DIDENGAR';
+  static const accumulateDurationListenSong =
+      'Akumulasi durasi lagu yang sudah dimainkan selama ini';
+  static const accumulateSongPlayed = 'Akumulasi total lagu yang sudah dimainkan selama ini';
 
   ///* Url Social Media
   static const urlFacebook = 'https://www.facebook.com/zeffry.reynando/';

@@ -73,19 +73,22 @@ class HomeHeaderLongestListen extends StatelessWidget {
               Positioned(
                 top: -20,
                 left: 0,
-                child: SizedBox(
+                child: Container(
                   height: sizes.width(context) / 4.5,
                   width: sizes.width(context) / 4.5,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      borderRadius: BorderRadius.circular(15)),
                   child: music.artwork == null
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
                             appConfig.fullPathImageAsset,
                             fit: BoxFit.cover,
                           ),
                         )
                       : ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.memory(
                             music.artwork!,
                             fit: BoxFit.cover,
