@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -81,7 +80,22 @@ final musicProvider = StateNotifierProvider((ref) => MusicProvider());
 
 final totalMusicDuration = StateProvider.autoDispose<String>((ref) {
   final _musics = ref.watch(musicProvider.state);
-  final totalSongDuration = _musics.fold<int>(0, (previousValue, currentValue) {
+  final _filteredMusic = ref.watch(filteredMusic).state;
+  final _searchQuery = ref.watch(searchQuery).state;
+
+  var tempList = <MusicModel>[];
+
+  if (_searchQuery.isEmpty) {
+    tempList = _musics;
+  } else {
+    if (_filteredMusic.isNotEmpty) {
+      tempList = _filteredMusic;
+    } else {
+      tempList = [];
+    }
+  }
+
+  final totalSongDuration = tempList.fold<int>(0, (previousValue, currentValue) {
     return previousValue + (currentValue.songDuration.inSeconds);
   });
 
@@ -100,7 +114,6 @@ final totalMusicDuration = StateProvider.autoDispose<String>((ref) {
   }
 
   return result;
-  // return Duration(seconds: totalSongDuration);
 });
 
 final musicById = StateProvider.family<MusicModel, String>((ref, idMusic) {
@@ -133,19 +146,19 @@ final filteredMusic = StateProvider.autoDispose<List<MusicModel>>((ref) {
   }
 
   if (result.isNotEmpty) {
-    /// Sorting [Ascending/Descending]
+    ///* Sorting [Ascending/Descending]
     if (_settingProvider.sortByType == SortByType.ascending) {
       result.sort((a, b) {
-        /// Sorting [Title,Artis,Duration][Ascending]
+        ///* Sorting [Title,Artis,Duration][Ascending]
 
         int sortingChoice = 0;
-        if (_settingProvider.sortChoice == "title") {
+        if (_settingProvider.sortChoice == ConstString.sortChoiceByTitle) {
           sortingChoice = (a.title ?? '').compareTo(b.title ?? '');
         }
-        if (_settingProvider.sortChoice == "artist") {
+        if (_settingProvider.sortChoice == ConstString.sortChoiceByArtist) {
           sortingChoice = (a.tag?.artist ?? '').compareTo(b.tag?.artist ?? '');
         }
-        if (_settingProvider.sortChoice == "duration") {
+        if (_settingProvider.sortChoice == ConstString.sortChoiceByDuration) {
           sortingChoice = (a.songDuration.inSeconds).compareTo(b.songDuration.inSeconds);
         }
         return sortingChoice;
@@ -202,10 +215,9 @@ final removeMusic = FutureProvider.family<void, String>((ref, path) async {
   final music =
       musics.firstWhere((element) => element.pathFile == path, orElse: () => MusicModel());
   if (music.idMusic.isEmpty) {
-    throw Exception('Failed to remove song from application');
+    throw Exception(ConstString.failedRemoveSong);
   }
   musicBox.delete(music.idMusic).then((_) => ref.read(musicProvider)._removeMusic(path));
-  log('Trigger Remove Background Music');
 });
 
 final addMusic = FutureProvider.family<void, String>((ref, path) async {
@@ -242,7 +254,6 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
     final isExists = musics.firstWhere(
         (element) => (element.pathFile ?? '').toLowerCase().contains(path.toLowerCase()),
         orElse: () => MusicModel());
-    log('IS EXISTS ||| $isExists');
 
     if (isExists.idMusic.isEmpty) {
       await players.open(Audio.file(path), autoStart: false);
@@ -265,7 +276,6 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
       _musicProvider._addMusic(music);
     }
   }
-  log('Trigger Add Background Music');
 });
 
 final setListenSong = FutureProvider.family<void, MusicModel>((ref, music) async {
