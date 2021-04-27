@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           );
         } else if (settings.name == WelcomeScreen.routeNamed) {
           return routeAnimation.scaleTransition(
-            screen: (ctx, __, ___) => WelcomeScreen(),
+            screen: (ctx, animation, secondaryAnimation) => WelcomeScreen(),
           );
         }
         return MaterialPageRoute(builder: (_) => UnknownScreen());
