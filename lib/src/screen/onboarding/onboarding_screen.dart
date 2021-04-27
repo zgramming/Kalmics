@@ -108,7 +108,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                   .read(settingProvider)
                   .setSettingOnboardingScreen(value: ConstString.finishedOnboarding),
             ]).then((value) {
-              Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed);
+              context.read(isLoading).state = false;
+              Future.delayed(const Duration(milliseconds: 100),
+                  () => Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed));
             }).catchError((error) {
               context.read(isLoading).state = false;
               GlobalFunction.showSnackBar(
@@ -116,6 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                 content: Text(error.toString()),
                 snackBarType: SnackBarType.error,
               );
+              return;
             });
           },
         ),
