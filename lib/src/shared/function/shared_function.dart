@@ -30,12 +30,12 @@ class SharedFunction {
 
           configFlutterLocalNotification
               .showNotificationChangesToSong(
-                title: 'File Has Added',
+                title: ConstString.watcherAddTitleMessage,
                 body: '$basename Detect has added to application',
                 context: context,
                 pathFile: file.path,
               )
-              .whenComplete(() => context.refresh(addMusic(file.path)));
+              .then((_) => context.refresh(addMusic(file.path)));
         }
 
         ///* Detect if file has remove on storage
@@ -44,7 +44,7 @@ class SharedFunction {
 
           configFlutterLocalNotification
               .showNotificationChangesToSong(
-                title: 'File Has Remove',
+                title: ConstString.watcherRemoveTitleMessage,
                 body: '$basename Detect has Remove from application',
                 context: context,
                 pathFile: file.path,
@@ -57,7 +57,7 @@ class SharedFunction {
         if (event.type == ChangeType.MODIFY) {
           log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
           configFlutterLocalNotification.showNotificationChangesToSong(
-            title: 'File Has Modify',
+            title: ConstString.watcherModifyTitleMessage,
             body: '$basename Detect has Modify to application',
             context: context,
             pathFile: file.path,
@@ -77,13 +77,18 @@ class SharedFunction {
         final currentIndex = context.read(currentSongProvider.state).currentIndex;
         if (currentIndex >= 0) {
           final music = context.read(musicProvider.state)[currentIndex];
-          final totalDuration = music.songDuration.inSeconds;
+          final songDuration = music.songDuration;
 
           context.read(currentSongProvider).setDuration(currentDuration);
 
-          /// Listen to current duration & total duration song
-          /// If current duration exceeds the total song duration, Then Play Next Song
-          if (currentDuration.inSeconds >= totalDuration) {
+          ///* Listen to current duration & total duration song
+          ///* If current duration exceeds the total song duration, Then Play Next Song
+
+          final roundCurrentDuration = (currentDuration.inMilliseconds / 1000).toDouble().round();
+          final roundSongDuration = (songDuration.inMilliseconds / 1000).toDouble().round();
+          log('currentDuration $roundCurrentDuration\nsongDuration $roundSongDuration\nCondition ${roundCurrentDuration >= roundSongDuration}');
+
+          if (roundCurrentDuration >= roundSongDuration) {
             context.refresh(nextSong).catchError((error) {
               GlobalFunction.showSnackBar(
                 context,
