@@ -102,4 +102,9 @@ class ConstString {
   static const messageTimerIsEqualNow = 'Timer tidak boleh sama dengan waktu sekarang';
   static const messageTimerGo = 'Timer dijalankan';
   static const messageTimerEnd = 'Timer telah berakhir';
+
+  ///* Watcher Message
+  static const watcherAddTitleMessage = 'Menambahkan lagu';
+  static const watcherRemoveTitleMessage = 'Menghapus lagu';
+  static const watcherModifyTitleMessage = 'Mengubah lagu';
 }

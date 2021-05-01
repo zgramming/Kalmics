@@ -104,7 +104,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
     final music = map['music'] as MusicModel;
     final currentIndex = map['index'] as int;
     await _players.open(
-      Audio.file(music.pathFile ?? '', metas: sharedParameter.metas(music)),
+      Audio.file(music.pathFile ?? '', metas: await sharedParameter.metas(music)),
       showNotification: true,
       notificationSettings: sharedParameter.notificationSettings(
         _globalContext!,
@@ -184,7 +184,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
       case LoopModeSetting.all:
         previousSong = _musics[previousIndex];
         await _players.open(
-          Audio.file(previousSong.pathFile!, metas: sharedParameter.metas(previousSong)),
+          Audio.file(previousSong.pathFile!, metas: await sharedParameter.metas(previousSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
@@ -196,7 +196,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
       case LoopModeSetting.single:
         previousSong = _musics[currentIndex];
         await _players.open(
-          Audio.file(previousSong.pathFile!, metas: sharedParameter.metas(previousSong)),
+          Audio.file(previousSong.pathFile!, metas: await sharedParameter.metas(previousSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
@@ -289,7 +289,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
         nextSong = _musics[nextIndex];
 
         await _players.open(
-          Audio.file(nextSong.pathFile ?? '', metas: sharedParameter.metas(nextSong)),
+          Audio.file(nextSong.pathFile ?? '', metas: await sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
@@ -307,7 +307,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
         nextSong = _musics[currentIndex];
 
         await _players.open(
-          Audio.file(nextSong.pathFile!, metas: sharedParameter.metas(nextSong)),
+          Audio.file(nextSong.pathFile!, metas: await sharedParameter.metas(nextSong)),
           showNotification: true,
           notificationSettings: sharedParameter.notificationSettings(
             _globalContext!,
