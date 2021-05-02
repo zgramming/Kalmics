@@ -30,13 +30,13 @@ Simple application to play music on your storage
 - [x] Info how many songs have been played
 - [x] share the song you are listening to on social media
 - [x] Re-design dashboard
+- [x] Show total duration listening all song
+- [x] Show total duration listening each song
 
  
 ### Uncompleted
 - [ ] Multiple playlist
 - [ ] Add song to favorite
-- [ ] Show total duration listening all song
-- [ ] Show total duration listening each song
 - [ ] Set song as ringtone
 - [ ] Cut song
 
