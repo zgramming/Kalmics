@@ -70,34 +70,17 @@ class SharedFunction {
   static void initAudioPlayers(BuildContext context) {
     final players = context.read(globalAudioPlayers).state;
 
-    players.currentPosition.listen((currentDuration) {
-      final musics = context.read(musicProvider.state);
+    players.playlistAudioFinished.listen((event) {
+      final currentSong = context.read(currentSongProvider.state);
 
-      if (musics.isNotEmpty) {
-        final currentIndex = context.read(currentSongProvider.state).currentIndex;
-        if (currentIndex >= 0) {
-          final music = context.read(musicProvider.state)[currentIndex];
-          final songDuration = music.songDuration;
-
-          context.read(currentSongProvider).setDuration(currentDuration);
-
-          ///* Listen to current duration & total duration song
-          ///* If current duration exceeds the total song duration, Then Play Next Song
-
-          final roundCurrentDuration = (currentDuration.inMilliseconds / 1000).toDouble().round();
-          final roundSongDuration = (songDuration.inMilliseconds / 1000).toDouble().round();
-          log('currentDuration $roundCurrentDuration\nsongDuration $roundSongDuration\nCondition ${roundCurrentDuration >= roundSongDuration}');
-
-          if (roundCurrentDuration >= roundSongDuration) {
-            context.refresh(nextSong).catchError((error) {
-              GlobalFunction.showSnackBar(
-                context,
-                content: Text(error.toString()),
-                snackBarType: SnackBarType.error,
-              );
-            });
-          }
-        }
+      if (currentSong.currentIndex >= 0) {
+        context.refresh(nextSong).catchError((error) {
+          GlobalFunction.showSnackBar(
+            context,
+            content: Text(error.toString()),
+            snackBarType: SnackBarType.error,
+          );
+        });
       }
     });
   }

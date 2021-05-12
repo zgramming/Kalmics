@@ -85,7 +85,7 @@ final totalCurrentSongDurationFormat = StateProvider.autoDispose<String>((ref) {
   return '$totalDurationInMinute.$_totalRemainingSecond';
 });
 
-final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
+final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
   final _players = ref.read(globalAudioPlayers).state;
   final _globalContext = ref.read(globalContext).state;
 
@@ -101,8 +101,7 @@ final playSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) as
   try {
     final sharedParameter = SharedParameter();
 
-    final music = map['music'] as MusicModel;
-    final currentIndex = map['index'] as int;
+    final currentIndex = _musics.indexWhere((element) => element.idMusic == music.idMusic);
     await _players.open(
       Audio.file(music.pathFile ?? '', metas: await sharedParameter.metas(music)),
       showNotification: true,

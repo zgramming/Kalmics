@@ -34,12 +34,7 @@ class MusicPlayerItem extends StatelessWidget {
           children: [
             ListTile(
               onTap: () async {
-                final map = {
-                  'music': result,
-                  'index': index,
-                };
-
-                context.refresh(playSong(map)).then(
+                context.refresh(playSong(result)).then(
                   (_) {
                     context.read(searchQuery).state = '';
                     return showModalBottomSheet(
