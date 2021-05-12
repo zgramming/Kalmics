@@ -71,17 +71,13 @@ class SharedFunction {
     final players = context.read(globalAudioPlayers).state;
 
     players.playlistAudioFinished.listen((event) {
-      final currentSong = context.read(currentSongProvider.state);
-
-      if (currentSong.currentIndex >= 0) {
-        context.refresh(nextSong).catchError((error) {
-          GlobalFunction.showSnackBar(
-            context,
-            content: Text(error.toString()),
-            snackBarType: SnackBarType.error,
-          );
-        });
-      }
+      context.refresh(nextSong).catchError((error) {
+        GlobalFunction.showSnackBar(
+          context,
+          content: Text(error.toString()),
+          snackBarType: SnackBarType.error,
+        );
+      });
     });
   }
 
