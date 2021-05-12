@@ -43,25 +43,25 @@ class MusicPlayerDetailSlider extends StatelessWidget {
             child: Consumer(
               builder: (_, watch, __) {
                 final players = watch(globalAudioPlayers).state;
-                final _currentSong = watch(currentSongProvider.state);
-                return Slider.adaptive(
-                  value: _currentSong.currentDuration.inSeconds.toDouble(),
-                  max: _currentSong.song.songDuration.inSeconds.toDouble(),
-                  onChangeStart: (value) async {
-                    final newDuration = Duration(seconds: value.toInt());
-                    await players.seek(newDuration);
-                    context.read(currentSongProvider).setDuration(newDuration);
+                // final _currentSong = watch(currentSongProvider.state);
+                final _currentSong = watch(currentSongPosition);
+
+                return _currentSong.when(
+                  data: (value) {
+                    final _currentDuration = value[0];
+                    final _maxDuration = value[1];
+                    return Slider.adaptive(
+                      value: _currentDuration,
+                      max: _maxDuration,
+                      onChanged: (value) async {
+                        final newDuration = Duration(seconds: value.toInt());
+                        await players.seek(newDuration);
+                        context.read(currentSongProvider).setDuration(newDuration);
+                      },
+                    );
                   },
-                  onChanged: (value) async {
-                    final newDuration = Duration(seconds: value.toInt());
-                    await players.seek(newDuration);
-                    context.read(currentSongProvider).setDuration(newDuration);
-                  },
-                  onChangeEnd: (value) async {
-                    final newDuration = Duration(seconds: value.toInt());
-                    await players.seek(newDuration);
-                    context.read(currentSongProvider).setDuration(newDuration);
-                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) => Text(error.toString()),
                 );
               },
             ),

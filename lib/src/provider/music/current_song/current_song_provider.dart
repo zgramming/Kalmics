@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:rxdart/rxdart.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -342,4 +342,16 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
     _currentSongProvider.stopSong();
     rethrow;
   }
+});
+
+final currentSongPosition = StreamProvider.autoDispose((ref) {
+  final AssetsAudioPlayer player = ref.watch(globalAudioPlayers).state;
+  ref.onDispose(() => player.dispose());
+
+  final Stream<double> _first = player.currentPosition.map((event) => event.inSeconds.toDouble());
+  final Stream<double> _second =
+      player.current.map((event) => event?.audio.duration.inSeconds.toDouble() ?? 0.0);
+
+  final tempList = [_first, _second];
+  return CombineLatestStream.list(tempList);
 });
