@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:rxdart/rxdart.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/services.dart';
@@ -346,7 +347,6 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 
 final currentSongPosition = StreamProvider.autoDispose((ref) {
   final AssetsAudioPlayer player = ref.watch(globalAudioPlayers).state;
-  ref.onDispose(() => player.dispose());
 
   final Stream<double> _first = player.currentPosition.map((event) => event.inSeconds.toDouble());
   final Stream<double> _second =
