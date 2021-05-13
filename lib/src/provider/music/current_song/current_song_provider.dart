@@ -52,6 +52,7 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
   void stopSong() {
     _setPlaying(false);
     _setFloating(false);
+    _setCurrentIndex(-1);
     setDuration(Duration.zero);
   }
 
@@ -87,17 +88,17 @@ final totalCurrentSongDurationFormat = StateProvider.autoDispose<String>((ref) {
 });
 
 final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
-  final _players = ref.read(globalAudioPlayers).state;
-  final _globalContext = ref.read(globalContext).state;
+  final _players = ref.watch(globalAudioPlayers).state;
+  final _globalContext = ref.watch(globalContext).state;
 
   ///* Get All musics
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.watch(musicProvider.state);
 
   ///* Initialize Current Song
-  final _currentSongProvider = ref.read(currentSongProvider);
+  final _currentSongProvider = ref.watch(currentSongProvider);
 
   ///* For Saving History Recents Play
-  final _recentPlayProvider = ref.read(recentPlayProvider);
+  final _recentPlayProvider = ref.watch(recentPlayProvider);
 
   try {
     final sharedParameter = SharedParameter();
@@ -106,7 +107,7 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
     await _players.open(
       Audio.file(music.pathFile ?? '', metas: await sharedParameter.metas(music)),
       showNotification: true,
-      notificationSettings: sharedParameter.notificationSettings(
+      notificationSettings: await sharedParameter.notificationSettings(
         _globalContext!,
         musics: _musics,
       ),
@@ -130,24 +131,24 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
 });
 
 final previousSong = FutureProvider<MusicModel>((ref) async {
-  final _players = ref.read(globalAudioPlayers).state;
+  final _players = ref.watch(globalAudioPlayers).state;
 
-  final _globalContext = ref.read(globalContext).state;
+  final _globalContext = ref.watch(globalContext).state;
 
   ///* Get All Music
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.watch(musicProvider.state);
 
   ///* For Set/Initialize current song
-  final _currentSongProvider = ref.read(currentSongProvider);
+  final _currentSongProvider = ref.watch(currentSongProvider);
 
   ///* Get Detail Current Song
-  final _currentSong = ref.read(currentSongProvider.state);
+  final _currentSong = ref.watch(currentSongProvider.state);
 
   ///* For Save history recents Play
-  final _recentPlayProvider = ref.read(recentPlayProvider);
+  final _recentPlayProvider = ref.watch(recentPlayProvider);
 
   ///* For get [Mode Loop , Mode Shuffle]
-  final _settingProvider = ref.read(settingProvider.state);
+  final _settingProvider = ref.watch(settingProvider.state);
 
   try {
     final loopModeSetting = _settingProvider.loopMode;
@@ -186,7 +187,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
         await _players.open(
           Audio.file(previousSong.pathFile!, metas: await sharedParameter.metas(previousSong)),
           showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
+          notificationSettings: await sharedParameter.notificationSettings(
             _globalContext!,
             musics: _musics,
           ),
@@ -198,7 +199,7 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
         await _players.open(
           Audio.file(previousSong.pathFile!, metas: await sharedParameter.metas(previousSong)),
           showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
+          notificationSettings: await sharedParameter.notificationSettings(
             _globalContext!,
             musics: _musics,
           ),
@@ -235,23 +236,23 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 });
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
-  final _players = ref.read(globalAudioPlayers).state;
-  final _globalContext = ref.read(globalContext).state;
+  final _players = ref.watch(globalAudioPlayers).state;
+  final _globalContext = ref.watch(globalContext).state;
 
   ///* Get All Music
-  final _musics = ref.read(musicProvider.state);
+  final _musics = ref.watch(musicProvider.state);
 
   ///* Set/Initialize Current Song
-  final _currentSongProvider = ref.read(currentSongProvider);
+  final _currentSongProvider = ref.watch(currentSongProvider);
 
   ///* Get Detail Current Song
-  final _currentSong = ref.read(currentSongProvider.state);
+  final _currentSong = ref.watch(currentSongProvider.state);
 
   ///* For saving to history recents play
-  final _recentPlayProvider = ref.read(recentPlayProvider);
+  final _recentPlayProvider = ref.watch(recentPlayProvider);
 
   ///* For get [Mode Loop , Mode Shuffle]
-  final _settingProvider = ref.read(settingProvider.state);
+  final _settingProvider = ref.watch(settingProvider.state);
 
   try {
     final loopModeSetting = _settingProvider.loopMode;
@@ -291,7 +292,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
         await _players.open(
           Audio.file(nextSong.pathFile ?? '', metas: await sharedParameter.metas(nextSong)),
           showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
+          notificationSettings: await sharedParameter.notificationSettings(
             _globalContext!,
             musics: _musics,
           ),
@@ -309,7 +310,7 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
         await _players.open(
           Audio.file(nextSong.pathFile!, metas: await sharedParameter.metas(nextSong)),
           showNotification: true,
-          notificationSettings: sharedParameter.notificationSettings(
+          notificationSettings: await sharedParameter.notificationSettings(
             _globalContext!,
             musics: _musics,
           ),

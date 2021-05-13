@@ -35,14 +35,14 @@ class SharedParameter {
     );
   }
 
-  NotificationSettings notificationSettings(
+  Future<NotificationSettings> notificationSettings(
     BuildContext context, {
     required List<MusicModel> musics,
-  }) {
+  }) async {
     final BuildContext _globalContext = context.read(globalContext).state!;
     return NotificationSettings(
-      customPrevAction: (players) => context.refresh(previousSong),
-      customPlayPauseAction: (player) {
+      customPrevAction: (players) async => await context.refresh(previousSong),
+      customPlayPauseAction: (player) async {
         player.playerState.listen((state) {
           switch (state) {
             case PlayerState.play:
@@ -57,13 +57,13 @@ class SharedParameter {
               break;
           }
         });
-        player.playOrPause();
+        await player.playOrPause();
       },
-      customNextAction: (player) => context.refresh(nextSong),
-      customStopAction: (player) {
+      customNextAction: (player) async => await context.refresh(nextSong),
+      customStopAction: (player) async {
         log('state stop');
         _globalContext.read(currentSongProvider).stopSong();
-        player.stop();
+        await player.stop();
       },
     );
   }
