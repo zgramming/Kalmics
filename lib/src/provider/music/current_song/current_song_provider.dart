@@ -348,10 +348,11 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
 final currentSongPosition = StreamProvider.autoDispose((ref) {
   final AssetsAudioPlayer player = ref.watch(globalAudioPlayers).state;
 
-  final Stream<double> _first = player.currentPosition.map((event) => event.inSeconds.toDouble());
-  final Stream<double> _second =
+  final Stream<double> currentDuration =
+      player.currentPosition.map((event) => event.inSeconds.toDouble());
+  final Stream<double> maxDuration =
       player.current.map((event) => event?.audio.duration.inSeconds.toDouble() ?? 0.0);
 
-  final tempList = [_first, _second];
+  final tempList = [currentDuration, maxDuration];
   return CombineLatestStream.list(tempList);
 });

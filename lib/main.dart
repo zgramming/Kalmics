@@ -24,13 +24,10 @@ class DurationAdapter extends TypeAdapter<Duration> {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  timeago.setLocaleMessages('id', timeago.IdMessages());
-  initializeDateFormatting();
+  await initializeDateFormatting();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  appConfig.configuration(nameLogoAsset: 'Kalmics.png');
 
   final appDocumentDir = await getApplicationDocumentsDirectory();
-
   Hive
     ..init(appDocumentDir.path)
     ..registerAdapter(MusicModelAdapter())
@@ -50,5 +47,9 @@ Future<void> main() async {
     onboardingColor2: const Color(0xFFA70071),
     onboardingColor3: const Color(0xFF52057B),
   );
+
+  timeago.setLocaleMessages('id', timeago.IdMessages());
+  appConfig.configuration(nameLogoAsset: 'Kalmics.png');
+
   runApp(ProviderScope(child: MyApp()));
 }

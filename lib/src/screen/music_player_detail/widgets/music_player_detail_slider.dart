@@ -43,9 +43,7 @@ class MusicPlayerDetailSlider extends StatelessWidget {
             child: Consumer(
               builder: (_, watch, __) {
                 final players = watch(globalAudioPlayers).state;
-                // final _currentSong = watch(currentSongProvider.state);
                 final _currentSong = watch(currentSongPosition);
-
                 return _currentSong.when(
                   data: (value) {
                     final _currentDuration = value[0];
