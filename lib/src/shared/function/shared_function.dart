@@ -32,7 +32,7 @@ class SharedFunction {
           configFlutterLocalNotification
               .showNotificationChangesToSong(
                 title: ConstString.watcherAddTitleMessage,
-                body: '$basename Detect has added to application',
+                body: '$basename ${ConstString.watcherAddBodyMessage}',
                 context: context,
                 pathFile: file.path,
               )
@@ -47,7 +47,7 @@ class SharedFunction {
           configFlutterLocalNotification
               .showNotificationChangesToSong(
                 title: ConstString.watcherRemoveTitleMessage,
-                body: '$basename Detect has Remove from application',
+                body: '$basename ${ConstString.watcherRemoveBodyMessage}',
                 context: context,
                 pathFile: file.path,
               )
@@ -61,7 +61,7 @@ class SharedFunction {
               'watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
           configFlutterLocalNotification.showNotificationChangesToSong(
             title: ConstString.watcherModifyTitleMessage,
-            body: '$basename Detect has Modify to application',
+            body: '$basename ${ConstString.watcherModifyBodyMessage}',
             context: context,
             pathFile: file.path,
           );
@@ -112,7 +112,7 @@ class SharedFunction {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Tunggu dulu',
+          ConstString.whooaaa,
           style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
         ),
         content: Consumer(
@@ -120,7 +120,7 @@ class SharedFunction {
             final _currentSong = watch(currentSongProvider.state);
             return Text.rich(
               TextSpan(
-                text: 'Sepertinya kamu sedang mendengarkan ',
+                text: ConstString.whileListenSong,
                 children: [
                   TextSpan(
                     text: _currentSong.song.title,
@@ -142,7 +142,7 @@ class SharedFunction {
             },
             style: OutlinedButton.styleFrom(primary: Colors.red),
             child: Text(
-              'Keluar Aplikasi',
+              ConstString.exitApplication,
               style: GoogleFonts.openSans(
                 fontWeight: FontWeight.w300,
               ),
@@ -154,7 +154,7 @@ class SharedFunction {
             },
             style: ElevatedButton.styleFrom(primary: colorPallete.accentColor),
             child: Text(
-              'Tetap disini',
+              ConstString.stayInApp,
               style: GoogleFonts.openSans(
                 fontWeight: FontWeight.w300,
               ),
@@ -223,10 +223,6 @@ class SharedFunction {
 
   static Future<void> timerPMB(BuildContext ctx) async {
     final context = ctx.read(globalContext).state!;
-
-    if (context.read(globalTimer).state?.isActive ?? false) {
-      context.read(globalTimer).state?.cancel();
-    }
 
     var messageSnackbar = '';
     var snackbarType = SnackBarType.normal;
@@ -308,10 +304,15 @@ class SharedFunction {
             snackBarType: SnackBarType.info,
           );
         } else {
-          context.read(globalRemainingTimer).state = timerGo.inSeconds - timer.tick;
+          final remainingTime = timerGo.inSeconds - timer.tick;
+          context.read(globalRemainingTimer).state = remainingTime;
         }
       },
     );
+
+    if (context.read(globalTimer).state?.isActive ?? false) {
+      context.read(globalTimer).state?.cancel();
+    }
 
     ///* Initialize Global Timer
     context.read(globalTimer).state = _timer;

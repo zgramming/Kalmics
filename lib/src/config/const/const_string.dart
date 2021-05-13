@@ -55,6 +55,10 @@ class ConstString {
   static const accumulateDurationListenSong =
       'Akumulasi durasi lagu yang sudah dimainkan selama ini';
   static const accumulateSongPlayed = 'Akumulasi total lagu yang sudah dimainkan selama ini';
+  static const whileListenSong = 'Sepertinya kamu sedang mendengarkan ';
+  static const whooaaa = 'Tunggu dulu';
+  static const exitApplication = 'Keluar Aplikasi';
+  static const stayInApp = 'Tetap disini';
 
   ///* Url Social Media
   static const urlFacebook = 'https://www.facebook.com/zeffry.reynando/';
@@ -105,6 +109,9 @@ class ConstString {
 
   ///* Watcher Message
   static const watcherAddTitleMessage = 'Menambahkan lagu';
+  static const watcherAddBodyMessage = 'ditambahkan ke aplikasi';
   static const watcherRemoveTitleMessage = 'Menghapus lagu';
+  static const watcherRemoveBodyMessage = 'dihapus dari aplikasi';
   static const watcherModifyTitleMessage = 'Mengubah lagu';
+  static const watcherModifyBodyMessage = 'terjadi perubahan';
 }
