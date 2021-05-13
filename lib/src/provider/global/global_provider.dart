@@ -25,9 +25,8 @@ final isModeSearch = StateProvider.autoDispose<bool>((ref) => false);
 /// Handling query Search
 final searchQuery = StateProvider.autoDispose<String>((ref) => '');
 
-/// Widget Timer
-final globalWidgetCounterTimer =
-    StateProvider.autoDispose<TweenAnimationBuilder<Duration>?>((ref) => null);
+/// Global remaining timer
+final globalRemainingTimer = StateProvider<int>((ref) => -1);
 
 /// Global Timer
 final globalTimer = StateProvider<Timer?>((ref) => null);
