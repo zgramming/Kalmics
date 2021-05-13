@@ -39,8 +39,8 @@ class MusicPlayerScreen extends StatelessWidget {
             builder: (_, watch, __) {
               final _totalMusic = watch(totalMusic).state;
               final _totalDurationMusic = watch(formatTotalDurationSong).state;
-              final _counterTimer = watch(globalWidgetCounterTimer).state;
-
+              final _timer = watch(globalTimer).state;
+              final _remainingTimer = watch(globalRemainingTimer).state;
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -55,13 +55,35 @@ class MusicPlayerScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    if (_counterTimer != null)
+                    if (_timer != null && _remainingTimer >= 0)
                       Row(
                         children: [
                           const SizedBox(width: 5),
                           const Icon(Icons.timer, color: Colors.white),
                           const SizedBox(width: 5),
-                          Center(child: _counterTimer),
+                          Center(
+                            child: TweenAnimationBuilder<Duration>(
+                              tween: Tween(
+                                  begin: Duration(seconds: _remainingTimer), end: Duration.zero),
+                              duration: Duration(seconds: _remainingTimer),
+                              builder: (context, value, child) {
+                                final hours = value.inHours;
+                                var minutes = value.inMinutes;
+                                var seconds = value.inSeconds % 60;
+                                Widget result;
+                                if (hours > 0) {
+                                  minutes = value.inMinutes % 60;
+                                  seconds = value.inSeconds % 60;
+                                  result = Text('$hours:$minutes:$seconds',
+                                      style: const TextStyle(fontSize: 10, color: Colors.white));
+                                } else {
+                                  result = Text('$minutes:$seconds',
+                                      style: const TextStyle(fontSize: 12, color: Colors.white));
+                                }
+                                return result;
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     Text(

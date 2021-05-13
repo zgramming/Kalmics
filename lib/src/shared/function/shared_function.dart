@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dv;
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -26,7 +26,8 @@ class SharedFunction {
       if (basename.endsWith('.mp3')) {
         ///* Detect if file has adding on storage
         if (event.type == ChangeType.ADD) {
-          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+          dv.log(
+              'watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
 
           configFlutterLocalNotification
               .showNotificationChangesToSong(
@@ -40,7 +41,8 @@ class SharedFunction {
 
         ///* Detect if file has remove on storage
         if (event.type == ChangeType.REMOVE) {
-          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+          dv.log(
+              'watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
 
           configFlutterLocalNotification
               .showNotificationChangesToSong(
@@ -55,7 +57,8 @@ class SharedFunction {
         ///* Detect if file has modify on storage
 
         if (event.type == ChangeType.MODIFY) {
-          log('watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
+          dv.log(
+              'watching changes on storage Android $event\nPath : ${event.path}\nAction : ${event.type}');
           configFlutterLocalNotification.showNotificationChangesToSong(
             title: ConstString.watcherModifyTitleMessage,
             body: '$basename Detect has Modify to application',
@@ -71,13 +74,20 @@ class SharedFunction {
     final players = context.read(globalAudioPlayers).state;
 
     players.playlistAudioFinished.listen((event) {
-      context.refresh(nextSong).catchError((error) {
-        GlobalFunction.showSnackBar(
-          context,
-          content: Text(error.toString()),
-          snackBarType: SnackBarType.error,
-        );
-      });
+      final currentSong = context.read(currentSongProvider.state);
+      dv.log('CurrentSong ${currentSong.currentIndex}');
+
+      /// Set Flag if user has stop music [index = -1 indicate song has stop]
+      /// Prevent apps to play next song
+      if (currentSong.currentIndex >= 0) {
+        context.refresh(nextSong).catchError((error) {
+          GlobalFunction.showSnackBar(
+            context,
+            content: Text(error.toString()),
+            snackBarType: SnackBarType.error,
+          );
+        });
+      }
     });
   }
 
@@ -86,9 +96,9 @@ class SharedFunction {
       await ConstString.androidMinimizeChannel
           .invokeMethod<bool>(ConstString.androidMinimizeFunction);
     } on PlatformException catch (error) {
-      log('platformException ${error.code} || ${error.details} || ${error.message}');
+      dv.log('platformException ${error.code} || ${error.details} || ${error.message}');
     } catch (e) {
-      log('catch ${e.toString()} ');
+      dv.log('catch ${e.toString()} ');
     }
   }
 
@@ -211,8 +221,8 @@ class SharedFunction {
     }
   }
 
-  static Future<void> timerPMB(BuildContext context) async {
-    context.read(globalWidgetCounterTimer).state = null;
+  static Future<void> timerPMB(BuildContext ctx) async {
+    final context = ctx.read(globalContext).state!;
 
     if (context.read(globalTimer).state?.isActive ?? false) {
       context.read(globalTimer).state?.cancel();
@@ -238,92 +248,89 @@ class SharedFunction {
 
     final nowDuration = Duration(hours: now.hour, minutes: now.minute).inSeconds;
 
-    if (timerPicker == null) {
-      messageSnackbar = ConstString.messageCancelTimer;
-    }
-
-    if (timerPickerDuration == nowDuration) {
-      messageSnackbar = ConstString.messageTimerIsEqualNow;
-      snackbarType = SnackBarType.warning;
-    }
-
-    if (timerPicker != null && timerPickerDuration != nowDuration) {
-      if (timerPickerDuration < nowDuration) {
-        result = (const Duration(days: 1).inSeconds) - (nowDuration - timerPickerDuration);
-        log('Kurang | ${const Duration(days: 1).inSeconds + nowDuration} - $timerPickerDuration = $result');
+    if (timerPickerDuration == nowDuration || timerPicker == null) {
+      if (timerPicker == null) {
+        messageSnackbar = ConstString.messageCancelTimer;
+        snackbarType = SnackBarType.info;
       }
 
-      if (timerPickerDuration > nowDuration) {
-        result = timerPickerDuration - nowDuration;
-        log('jalankan timer || $timerPickerDuration - $nowDuration = ${timerPickerDuration - nowDuration}');
+      if (timerPickerDuration == nowDuration) {
+        messageSnackbar = ConstString.messageTimerIsEqualNow;
+        snackbarType = SnackBarType.warning;
       }
 
-      timerGo = Duration(seconds: result);
-
-      messageSnackbar = ConstString.messageTimerGo;
-      snackbarType = SnackBarType.success;
-
-      final _timer = Timer.periodic(
-        const Duration(seconds: 1),
-        (timer) {
-          log('Tick: ${timer.tick}\nTimerGo: ${timerGo.inSeconds}');
-          if (timer.tick >= timerGo.inSeconds) {
-            ///* Stop Song
-            context
-                .read(globalAudioPlayers)
-                .state
-                .stop()
-                .then((_) => context.read(currentSongProvider).stopSong());
-
-            ///* Stop Timer
-            timer.cancel();
-
-            ///* Reset Widget Counter Timer
-            context.read(globalWidgetCounterTimer).state = null;
-
-            ///* Show message if timer is end
-            GlobalFunction.showSnackBar(
-              context,
-              content: const Text(ConstString.messageTimerEnd),
-              snackBarType: SnackBarType.info,
-            );
-          }
-        },
+      GlobalFunction.showSnackBar(
+        context,
+        content: Text(messageSnackbar),
+        snackBarType: snackbarType,
       );
-
-      ///* Initialize Global Timer
-      context.read(globalTimer).state = _timer;
-
-      ///* Initialize Widget Counter Timer
-      context.read(globalWidgetCounterTimer).state = TweenAnimationBuilder<Duration>(
-        tween: Tween(begin: timerGo, end: Duration.zero),
-        duration: timerGo,
-        onEnd: () => log('Selesai Timer'),
-        builder: (context, value, child) {
-          final hours = value.inHours;
-          var minutes = value.inMinutes;
-          var seconds = value.inSeconds % 60;
-          Widget result;
-          if (hours > 0) {
-            minutes = value.inMinutes % 60;
-            seconds = value.inSeconds % 60;
-            result = Text('$hours:$minutes:$seconds',
-                style: const TextStyle(fontSize: 10, color: Colors.white));
-          } else {
-            result = Text('$minutes:$seconds',
-                style: const TextStyle(fontSize: 12, color: Colors.white));
-          }
-          return result;
-        },
-      );
+      return;
     }
 
-    ///* Show message depend condition
+    if (timerPickerDuration < nowDuration) {
+      result = (const Duration(days: 1).inSeconds) - (nowDuration - timerPickerDuration);
+      dv.log(
+          'Kurang | ${const Duration(days: 1).inSeconds + nowDuration} - $timerPickerDuration = $result');
+    }
 
-    GlobalFunction.showSnackBar(
-      context,
-      content: Text(messageSnackbar),
-      snackBarType: snackbarType,
+    if (timerPickerDuration > nowDuration) {
+      result = timerPickerDuration - nowDuration;
+      dv.log(
+          'jalankan timer || $timerPickerDuration - $nowDuration = ${timerPickerDuration - nowDuration}');
+    }
+
+    timerGo = Duration(seconds: result);
+
+    messageSnackbar = ConstString.messageTimerGo;
+    snackbarType = SnackBarType.success;
+
+    final _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) async {
+        dv.log('Tick: ${timer.tick}\nTimerGo: ${timerGo.inSeconds}');
+        if (timer.tick >= timerGo.inSeconds) {
+          ///* Stop Timer
+          timer.cancel();
+
+          ///* Reset remaining timer
+          context.read(globalRemainingTimer).state = -1;
+
+          ///* Reset Current Song
+          context.read(currentSongProvider).stopSong();
+
+          ///* Stop Song
+          await context.read(globalAudioPlayers).state.stop();
+
+          ///* Show message if timer is end
+          GlobalFunction.showSnackBar(
+            context,
+            content: const Text(ConstString.messageTimerEnd),
+            snackBarType: SnackBarType.info,
+          );
+        } else {
+          context.read(globalRemainingTimer).state = timerGo.inSeconds - timer.tick;
+        }
+      },
     );
+
+    ///* Initialize Global Timer
+    context.read(globalTimer).state = _timer;
+  }
+}
+
+class TimerCountdown extends StatefulWidget {
+  @override
+  _TimerCountdownState createState() => _TimerCountdownState();
+}
+
+class _TimerCountdownState extends State<TimerCountdown> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
