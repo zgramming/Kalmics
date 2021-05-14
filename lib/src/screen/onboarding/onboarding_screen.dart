@@ -97,9 +97,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                     }
                   },
                 );
+                return;
               }
+            }
+            final checkPermissionAgain = await Permission.storage.status;
+            if (checkPermissionAgain != PermissionStatus.granted) {
               return;
             }
+
             context.read(isLoading).state = true;
             await Future.wait([
               context.refresh(initializeMusicFromStorage),
