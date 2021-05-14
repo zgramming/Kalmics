@@ -7,9 +7,11 @@ import '../../../shared/my_shared.dart';
 
 import './music_player_action_more_sorting.dart';
 
-class MusicPlayerActionMore extends StatelessWidget {
+class MusicPlayerActionMore extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
+    final _timer = watch(globalTimer).state;
+    final _remainingTimer = watch(globalRemainingTimer).state;
     return PopupMenuButton(
       onSelected: (value) async {
         switch (value) {
@@ -29,6 +31,15 @@ class MusicPlayerActionMore extends StatelessWidget {
               context: context,
               builder: (ctx) => const MusicPlayerActionMoreSorting(),
             );
+            break;
+
+          case ConstString.cancelTimerPMB:
+
+            ///* Cancel Timer
+            context.read(globalTimer).state!.cancel();
+
+            ///* Reset remaining timer
+            context.read(globalRemainingTimer).state = -1;
             break;
           default:
         }
@@ -54,16 +65,28 @@ class MusicPlayerActionMore extends StatelessWidget {
             ],
           ),
         ),
-        PopupMenuItem(
-          value: ConstString.timerPMB,
-          child: Row(
-            children: const [
-              Icon(Icons.timer_rounded, color: Colors.black),
-              SizedBox(width: 10),
-              Text('Timer'),
-            ],
+        if (_timer != null && _remainingTimer >= 0)
+          PopupMenuItem(
+            value: 'cancelTimer',
+            child: Row(
+              children: const [
+                Icon(Icons.cancel_sharp, color: Colors.red),
+                SizedBox(width: 10),
+                Text('Batalkan Timer', style: TextStyle(color: Colors.red)),
+              ],
+            ),
+          )
+        else
+          PopupMenuItem(
+            value: ConstString.timerPMB,
+            child: Row(
+              children: const [
+                Icon(Icons.timer_rounded, color: Colors.black),
+                SizedBox(width: 10),
+                Text('Timer'),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }

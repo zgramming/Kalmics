@@ -246,7 +246,7 @@ class SharedFunction {
 
     if (timerPickerDuration == nowDuration || timerPicker == null) {
       if (timerPicker == null) {
-        messageSnackbar = ConstString.messageCancelTimer;
+        messageSnackbar = ConstString.messageTimerNotSetup;
         snackbarType = SnackBarType.info;
       }
 
@@ -303,6 +303,8 @@ class SharedFunction {
             content: const Text(ConstString.messageTimerEnd),
             snackBarType: SnackBarType.info,
           );
+
+          return;
         } else {
           final remainingTime = timerGo.inSeconds - timer.tick;
           context.read(globalRemainingTimer).state = remainingTime;

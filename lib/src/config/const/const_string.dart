@@ -18,6 +18,7 @@ class ConstString {
   static const String sortSongPMB = 'sort';
   static const String timerPMB = 'timer';
   static const String editSongPMB = 'edit';
+  static const String cancelTimerPMB = 'cancelTimer';
 
   ///* LoopMode Value
   static const String loopModeAll = 'all';
@@ -102,7 +103,7 @@ class ConstString {
   static const toolTipShowOffSong = 'Pamerkan lagu yang sedang dimainkan';
 
   ///* Timer Message
-  static const messageCancelTimer = 'Timer dibatalkan';
+  static const messageTimerNotSetup = 'Timer belum disetting';
   static const messageTimerIsEqualNow = 'Timer tidak boleh sama dengan waktu sekarang';
   static const messageTimerGo = 'Timer dijalankan';
   static const messageTimerEnd = 'Timer telah berakhir';
