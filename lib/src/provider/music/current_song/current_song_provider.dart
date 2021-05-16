@@ -100,7 +100,7 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
   final _musics = ref.watch(musicProvider.state);
 
   ///* Initialize Current Song
-  final _currentSongProvider = ref.watch(currentSongProvider);
+  final _currentSong = ref.watch(currentSongProvider.state);
 
   ///* For Saving History Recents Play
   final _recentPlayProvider = ref.watch(recentPlayProvider);
@@ -109,6 +109,22 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
     final sharedParameter = SharedParameter();
 
     final currentIndex = _musics.indexWhere((element) => element.idMusic == music.idMusic);
+
+    if (_currentSong.currentIndex >= 0) {
+      ///* Save Listen Current Song Duration Every Song
+      final newDuration = ref.read(currentSongProvider)._calculateTotalListeningSong(
+            music: _currentSong.song,
+            currentDuration: Duration(
+              seconds: _players.currentPosition.valueWrapper?.value.inSeconds ?? 0,
+            ),
+          );
+
+      ref.read(musicProvider).setListenSong(
+            currentSongPlayed: _currentSong.song,
+            newDuration: newDuration,
+          );
+    }
+
     await _players.open(
       Audio.file(music.pathFile ?? '', metas: await sharedParameter.metas(music)),
       showNotification: true,
@@ -118,7 +134,7 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
       ),
     );
 
-    _currentSongProvider._setInitSong(music, index: currentIndex);
+    ref.read(currentSongProvider)._setInitSong(music, index: currentIndex);
 
     ///* Save History Recents Play
     _recentPlayProvider.add(music);
@@ -127,10 +143,10 @@ final playSong = FutureProvider.family<void, MusicModel>((ref, music) async {
     if (platformException.code == ConstString.codeErrorCantOpenSong) {
       message = ConstString.songNotFoundInDirectory;
     }
-    _currentSongProvider.stopSong();
+    ref.read(currentSongProvider).stopSong();
     throw message;
   } catch (e) {
-    _currentSongProvider.stopSong();
+    ref.read(currentSongProvider).stopSong();
     rethrow;
   }
 });
