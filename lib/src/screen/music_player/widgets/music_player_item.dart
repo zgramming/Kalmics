@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../network/my_network.dart';
@@ -13,9 +14,11 @@ import './music_player_error_dialog.dart';
 
 class MusicPlayerItem extends StatelessWidget {
   final List<MusicModel> musics;
+  final MusicModel currentSong;
 
   const MusicPlayerItem({
     required this.musics,
+    required this.currentSong,
   });
 
   @override
@@ -32,54 +35,72 @@ class MusicPlayerItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              onTap: () async {
-                context.refresh(playSong(result)).then(
-                  (_) {
-                    context.read(searchQuery).state = '';
-                    return showModalBottomSheet(
+            Material(
+              color: result.idMusic == currentSong.idMusic
+                  ? colorPallete.monochromaticColor
+                  : Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  if (result.idMusic == currentSong.idMusic) {
+                    showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
                       builder: (ctx) => MusicPlayerDetailScreen(),
                     );
-                  },
-                ).catchError(
-                  (error) => showDialog(
-                    context: context,
-                    builder: (context) => MusicPlayerErrorDialog(error: error.toString()),
-                  ),
-                );
-              },
-              leading: MusicPlayerItemImage(result: result, artwork: artwork),
-              title: Text(
-                result.title ?? '',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.openSans(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: Colors.white,
-                ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Consumer(
-                  builder: (context, watch, child) {
-                    final _formatDuration = watch(formatEachDurationSong(result.idMusic)).state;
+                    return;
+                  }
 
-                    return Text(
-                      '$_formatDuration | ${(artis?.isNotEmpty ?? false) ? artis : 'Unknown Artist'}',
-                      maxLines: 1,
-                      style: GoogleFonts.openSans(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 10,
-                      ),
-                    );
-                  },
+                  context.refresh(playSong(result)).then(
+                    (_) {
+                      context.read(searchQuery).state = '';
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (ctx) => MusicPlayerDetailScreen(),
+                      );
+                    },
+                  ).catchError(
+                    (error) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => MusicPlayerErrorDialog(error: error.toString()),
+                      );
+                    },
+                  );
+                },
+                child: ListTile(
+                  leading: MusicPlayerItemImage(result: result, artwork: artwork),
+                  title: Text(
+                    result.title ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.openSans(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Consumer(
+                      builder: (context, watch, child) {
+                        final _formatDuration = watch(formatEachDurationSong(result.idMusic)).state;
+
+                        return Text(
+                          '$_formatDuration | ${(artis?.isNotEmpty ?? false) ? artis : 'Unknown Artist'}',
+                          maxLines: 1,
+                          style: GoogleFonts.openSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  trailing: MusicPlayerItemTrailing(result: result),
                 ),
               ),
-              trailing: MusicPlayerItemTrailing(result: result),
             ),
             if (musics.length - 1 != index)
               Divider(

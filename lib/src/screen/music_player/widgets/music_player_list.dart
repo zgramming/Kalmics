@@ -20,7 +20,10 @@ class MusicPlayerList extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                MusicPlayerItem(musics: _filteredMusic),
+                MusicPlayerItem(
+                  musics: _filteredMusic,
+                  currentSong: _currentSongProvider.song,
+                ),
                 if (_currentSongProvider.isFloating) const SizedBox(height: kToolbarHeight * 1.75)
               ],
             ),
