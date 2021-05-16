@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -12,7 +14,7 @@ import './item/music_player_item_image.dart';
 import './item/music_player_item_trailing.dart';
 import './music_player_error_dialog.dart';
 
-class MusicPlayerItem extends StatelessWidget {
+class MusicPlayerItem extends StatefulWidget {
   final List<MusicModel> musics;
   final MusicModel currentSong;
 
@@ -22,26 +24,49 @@ class MusicPlayerItem extends StatelessWidget {
   });
 
   @override
+  _MusicPlayerItemState createState() => _MusicPlayerItemState();
+}
+
+class _MusicPlayerItemState extends State<MusicPlayerItem> {
+  final GlobalKey key = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      final currentSong = context.read(currentSongProvider.state);
+      if (currentSong.currentIndex >= 0 && key.currentContext != null) {
+        Scrollable.ensureVisible(
+          key.currentContext!,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.fastOutSlowIn,
+        );
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: musics.length,
+      itemCount: widget.musics.length,
       itemBuilder: (context, index) {
-        final result = musics[index];
+        final result = widget.musics[index];
         final artis = result.tag?.artist;
         final artwork = result.artwork;
         return Column(
+          key: result.idMusic == widget.currentSong.idMusic ? key : null,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             Material(
-              color: result.idMusic == currentSong.idMusic
+              color: result.idMusic == widget.currentSong.idMusic
                   ? colorPallete.monochromaticColor
                   : Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  if (result.idMusic == currentSong.idMusic) {
+                  if (result.idMusic == widget.currentSong.idMusic) {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -102,7 +127,7 @@ class MusicPlayerItem extends StatelessWidget {
                 ),
               ),
             ),
-            if (musics.length - 1 != index)
+            if (widget.musics.length - 1 != index)
               Divider(
                 color: Colors.white.withOpacity(.5),
                 endIndent: 15,
