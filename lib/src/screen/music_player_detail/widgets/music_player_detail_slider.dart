@@ -54,7 +54,6 @@ class MusicPlayerDetailSlider extends StatelessWidget {
                       onChanged: (value) async {
                         final newDuration = Duration(seconds: value.toInt());
                         await players.seek(newDuration);
-                        context.read(currentSongProvider).setDuration(newDuration);
                       },
                     );
                   },

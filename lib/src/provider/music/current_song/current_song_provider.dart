@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:rxdart/rxdart.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kalmics/src/config/my_config.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../../network/my_network.dart';
 import '../../../shared/my_shared.dart';
@@ -12,14 +12,15 @@ import '../../my_provider.dart';
 
 class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
   CurrentSongProvider([CurrentSongModel? state])
-      : super(state ??
-            CurrentSongModel(
-              song: MusicModel(),
-              isPlaying: false,
-              isFloating: false,
-              currentIndex: -1,
-              currentDuration: Duration.zero,
-            ));
+      : super(
+          state ??
+              CurrentSongModel(
+                song: MusicModel(),
+                isPlaying: false,
+                isFloating: false,
+                currentIndex: -1,
+              ),
+        );
 
   void _setCurrentIndex(int index) {
     state = state.copyWith(currentIndex: index);
@@ -37,10 +38,6 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     state = state.copyWith(song: music);
   }
 
-  void setDuration(Duration currentDuration) {
-    state = state.copyWith(currentDuration: currentDuration);
-  }
-
   void resumeSong() {
     _setPlaying(true);
   }
@@ -53,7 +50,6 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     _setPlaying(false);
     _setFloating(false);
     _setCurrentIndex(-1);
-    setDuration(Duration.zero);
   }
 
   void _setInitSong(
@@ -66,7 +62,16 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     _setPlaying(isPlaying);
     _setFloating(isFloating);
     _setCurrentIndex(index ?? state.currentIndex);
-    setDuration(Duration.zero);
+  }
+
+  Duration _calculateTotalListeningSong({
+    required MusicModel music,
+    required Duration currentDuration,
+  }) {
+    final newDuration =
+        Duration(seconds: music.totalListenSong.inSeconds + currentDuration.inSeconds);
+
+    return newDuration;
   }
 }
 
@@ -178,8 +183,18 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
       }
     }
 
-    ///* Save Listen Song Duration Every Song
-    ref.read(setListenSong(_currentSong.song));
+    ///* Save Listen Current Song Duration Every Song
+    final newDuration = _currentSongProvider._calculateTotalListeningSong(
+      music: _currentSong.song,
+      currentDuration: Duration(
+        seconds: _players.currentPosition.valueWrapper?.value.inSeconds ?? 0,
+      ),
+    );
+
+    ref.read(musicProvider).setListenSong(
+          currentSongPlayed: _currentSong.song,
+          newDuration: newDuration,
+        );
 
     switch (loopModeSetting) {
       case LoopModeSetting.all:
@@ -283,7 +298,16 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
     }
 
     ///* Save Listen Current Song Duration Every Song
-    ref.read(setListenSong(_currentSong.song));
+    final newDuration = _currentSongProvider._calculateTotalListeningSong(
+      music: _currentSong.song,
+      currentDuration: Duration(
+        seconds: _players.currentPosition.valueWrapper?.value.inSeconds ?? 0,
+      ),
+    );
+    ref.read(musicProvider).setListenSong(
+          currentSongPlayed: _currentSong.song,
+          newDuration: newDuration,
+        );
 
     switch (loopModeSetting) {
       case LoopModeSetting.all:
@@ -351,6 +375,7 @@ final currentSongPosition = StreamProvider.autoDispose((ref) {
 
   final Stream<double> currentDuration =
       player.currentPosition.map((event) => event.inSeconds.toDouble());
+
   final Stream<double> maxDuration =
       player.current.map((event) => event?.audio.duration.inSeconds.toDouble() ?? 0.0);
 

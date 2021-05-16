@@ -69,10 +69,21 @@ class MusicProvider extends StateNotifier<List<MusicModel>> {
     state = [...tempList];
   }
 
-  void _setListenSong(MusicModel music, Duration newDuration) {
+  Future<void> setListenSong({
+    required MusicModel currentSongPlayed,
+    required Duration newDuration,
+  }) async {
+    final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
+
+    await musicBox.put(
+        currentSongPlayed.idMusic, currentSongPlayed.copyWith(totalListenSong: newDuration));
+
     state = [
       for (var item in state)
-        if (item.idMusic == music.idMusic) item.copyWith(totalListenSong: newDuration) else item
+        if (item.idMusic == currentSongPlayed.idMusic)
+          item.copyWith(totalListenSong: newDuration)
+        else
+          item
     ];
   }
 }
@@ -362,18 +373,20 @@ final addMusic = FutureProvider.family<void, String>((ref, path) async {
   }
 });
 
-final setListenSong = FutureProvider.family<void, MusicModel>((ref, music) async {
-  final currentSongDuration = ref.watch(currentSongProvider.state).currentDuration;
-  final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
+// final setListenSong = FutureProvider.family<void, MusicModel>((ref, music) async {
+//   final currentSongDuration = ref.watch(currentSongProvider.state).currentDuration;
+//   final musicBox = Hive.box<MusicModel>(MusicProvider.musicBoxKey);
 
-  final calculateTotalDuration = music.totalListenSong.inSeconds + currentSongDuration.inSeconds;
-  await musicBox.put(
-    music.idMusic,
-    music.copyWith(totalListenSong: Duration(seconds: calculateTotalDuration)),
-  );
+//   final calculateTotalDuration = music.totalListenSong.inSeconds + currentSongDuration.inSeconds;
+//   await musicBox.put(
+//     music.idMusic,
+//     music.copyWith(totalListenSong: Duration(seconds: calculateTotalDuration)),
+//   );
 
-  ref.watch(musicProvider)._setListenSong(music, Duration(seconds: calculateTotalDuration));
-});
+//   ref
+//       .watch(musicProvider)
+//       ._setListenSong(music: music, newDuration: Duration(seconds: calculateTotalDuration));
+// });
 
 final editSong = FutureProvider.family<void, Map<String, dynamic>>((ref, map) async {
   final _musics = ref.read(musicProvider.state);
