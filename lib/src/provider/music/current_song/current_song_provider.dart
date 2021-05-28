@@ -1,6 +1,8 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audiotagger/audiotagger.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kalmics/src/config/my_config.dart';
@@ -68,8 +70,9 @@ class CurrentSongProvider extends StateNotifier<CurrentSongModel> {
     required MusicModel music,
     required Duration currentDuration,
   }) {
-    final newDuration =
-        Duration(seconds: music.totalListenSong.inSeconds + currentDuration.inSeconds);
+    final newDuration = Duration(
+      seconds: music.totalListenSong.inSeconds + currentDuration.inSeconds,
+    );
 
     return newDuration;
   }
@@ -267,6 +270,8 @@ final previousSong = FutureProvider<MusicModel>((ref) async {
 });
 
 final nextSong = FutureProvider<MusicModel>((ref) async {
+  final tagger = Audiotagger();
+
   final _players = ref.watch(globalAudioPlayers).state;
   final _globalContext = ref.watch(globalContext).state;
 
@@ -313,17 +318,35 @@ final nextSong = FutureProvider<MusicModel>((ref) async {
       }
     }
 
+    dev.log(
+        'Current Song Position ${_players.currentPosition.value} \n Current Song Total Duration ${_players.current.value?.audio.audio.path}');
+
     ///* Save Listen Current Song Duration Every Song
+    /// Get Total Song Duration
+    final currentSongTotalDuration = Duration(
+      seconds: (await tagger.readAudioFile(path: _currentSong.song.pathFile ?? ''))?.length ?? 0,
+    );
+
+    /// Get Current Song Duration Position
+    /// Add condition when curreng song has finished
+    /// if current song duration == Duration.zero, initialize total song duration
+    /// else initialize current song duration
+    final currentSongDuration = (_players.currentPosition.value == Duration.zero
+            ? currentSongTotalDuration
+            : _players.currentPosition.value) ??
+        Duration.zero;
+
     final newDuration = _currentSongProvider._calculateTotalListeningSong(
       music: _currentSong.song,
-      currentDuration: Duration(
-        seconds: _players.currentPosition.valueWrapper?.value.inSeconds ?? 0,
-      ),
+      currentDuration: currentSongDuration,
     );
+
     ref.read(musicProvider).setListenSong(
           currentSongPlayed: _currentSong.song,
           newDuration: newDuration,
         );
+
+    ///* END Save Listen Current Song Duration Every Song
 
     switch (loopModeSetting) {
       case LoopModeSetting.all:

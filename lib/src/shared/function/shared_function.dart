@@ -320,20 +320,3 @@ class SharedFunction {
     context.read(globalTimer).state = _timer;
   }
 }
-
-class TimerCountdown extends StatefulWidget {
-  @override
-  _TimerCountdownState createState() => _TimerCountdownState();
-}
-
-class _TimerCountdownState extends State<TimerCountdown> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
