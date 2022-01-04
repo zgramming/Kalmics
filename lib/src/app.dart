@@ -1,42 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_template/global_template.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import './screen/music_player/music_player_screen.dart';
-import './screen/music_player_detail/music_player_detail_screen.dart';
-import './screen/splash/splash_screen.dart';
-import './screen/welcome/welcome_screen.dart';
+import 'presentation/pages/home/home_page.dart';
+import 'presentation/pages/music_player/music_player_page.dart';
+import 'presentation/pages/song_edit/song_edit_page.dart';
+import 'presentation/pages/song_info/song_info_page.dart';
+import 'presentation/pages/splash/splash_page.dart';
+import 'presentation/pages/welcome/welcome_page.dart';
+import 'utils/colors.dart';
+import 'utils/navigation.dart';
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  final routeAnimation = RouteAnimation();
+  MyApp({Key? key}) : super(key: key);
+
+  final ThemeData theme = ThemeData();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kalmics',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: colorPallete.primaryColor,
-        accentColor: colorPallete.accentColor,
-        textTheme: GoogleFonts.openSansTextTheme(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('id', 'ID')],
+      navigatorKey: navigatorKey,
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(
+          primary: primary,
+          secondary: secondary,
+          onError: Colors.red,
+        ),
+        textTheme: GoogleFonts.amikoTextTheme(Theme.of(context).textTheme),
+        scaffoldBackgroundColor: primary,
+        bottomSheetTheme: const BottomSheetThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20.0),
+            ),
+          ),
+        ),
       ),
-      home: SplashScreen(),
+      home: const SplashPage(),
       onGenerateRoute: (settings) {
-        if (settings.name == MusicPlayerScreen.routeNamed) {
-          return routeAnimation.slideTransition(
-            screen: (ctx, animation, secondaryAnimation) => MusicPlayerScreen(),
-            slidePosition: SlidePosition.fromLeft,
-          );
-        } else if (settings.name == MusicPlayerDetailScreen.routeNamed) {
-          return routeAnimation.fadeTransition(
-            screen: (ctx, animation, secondaryAnimation) => MusicPlayerDetailScreen(),
-          );
-        } else if (settings.name == WelcomeScreen.routeNamed) {
-          return routeAnimation.scaleTransition(
-            screen: (ctx, animation, secondaryAnimation) => WelcomeScreen(),
-          );
+        final routeAnimation = RouteAnimation();
+        switch (settings.name) {
+          case WelcomePage.routeNamed:
+            return routeAnimation.fadeTransition(
+              screen: (ctx, animation, secondaryAnimation) => const WelcomePage(),
+            );
+
+          case HomePage.routeNamed:
+            return routeAnimation.fadeTransition(
+              screen: (ctx, animation, secondaryAnimation) => const HomePage(),
+            );
+
+          case SongEditPage.routeNamed:
+            return routeAnimation.fadeTransition(
+              screen: (ctx, animation, secondaryAnimation) => const SongEditPage(),
+            );
+
+          case SongInfoPage.routeNamed:
+            return routeAnimation.fadeTransition(
+              screen: (ctx, animation, secondaryAnimation) => const SongInfoPage(),
+            );
+
+          case MusicPlayerPage.routeNamed:
+            return routeAnimation.slideTransition(
+              screen: (ctx, animation, secondaryAnimation) => const MusicPlayerPage(),
+            );
+
+          default:
         }
-        return MaterialPageRoute(builder: (_) => UnknownScreen());
       },
     );
   }
