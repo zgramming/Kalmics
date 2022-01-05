@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../utils/colors.dart';
-import '../splash_page.dart';
+import '../../onboarding/onboarding_page.dart';
 
 class PercetageIndicator extends StatelessWidget {
   const PercetageIndicator({

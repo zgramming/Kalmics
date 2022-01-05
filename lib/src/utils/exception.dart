@@ -23,3 +23,12 @@ class LocationServiceDisabled implements Exception {
 
   LocationServiceDisabled(this.message);
 }
+
+class StoragePermissionDeniedPermanent implements Exception {
+  const StoragePermissionDeniedPermanent({
+    this.message =
+        'Kami memerlukan izin penyimpanan agar aplikasi berjalan dengan lancar, silahkan izinkan aplikasi untuk mengakses penyimpanan secara manual',
+  });
+
+  final String message;
+}
