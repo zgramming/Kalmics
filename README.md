@@ -73,7 +73,7 @@ Simple application to play music on your storage
   </tr>
  </table>
 
- ## Issues
+## Issues
 
 Please file any issues, bugs or feature request as an issue on <a href="https://github.com/zgramming/Kalmics/issues"><b> Github </b></a>
 
